@@ -1,0 +1,12 @@
+@import "./normalize.css";
+@import "./element-ui.scss";
+@import "./transition.scss";
+@import "./variable.scss";
+@import "./theme.scss";
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: $color-background-base;
+}
