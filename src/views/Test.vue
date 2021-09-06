@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import { ElButton } from 'element-plus'
 export default {
   name: "Test"
 }

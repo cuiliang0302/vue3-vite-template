@@ -1,31 +1,60 @@
 <template>
-  <h1>这是父组件，名字叫{{ name }}</h1>
-  <button type="button" @click="valueAdd">
-    count is: {{ state.count }}
-  </button>
-  <hr/>
-  <Test msg="吃了吗？" :status="state.count%2===0 ? '没吃饭' : '吃饭了'" @toFather="toFather"/>
+  <el-menu
+      :default-active="activeIndex"
+      class="el-menu-demo"
+      mode="horizontal"
+      @select="handleSelect"
+  >
+    <el-menu-item index="1">处理中心</el-menu-item>
+    <el-sub-menu index="2">
+      <template #title>我的工作台</template>
+      <el-menu-item index="2-1">选项1</el-menu-item>
+      <el-menu-item index="2-2">选项2</el-menu-item>
+      <el-menu-item index="2-3">选项3</el-menu-item>
+      <el-sub-menu index="2-4">
+        <template #title>选项4</template>
+        <el-menu-item index="2-4-1">选项1</el-menu-item>
+        <el-menu-item index="2-4-2">选项2</el-menu-item>
+        <el-menu-item index="2-4-3">选项3</el-menu-item>
+      </el-sub-menu>
+    </el-sub-menu>
+    <el-menu-item index="3" disabled>消息中心</el-menu-item>
+    <el-menu-item index="4">订单管理</el-menu-item>
+  </el-menu>
+  <div class="line"></div>
+  <el-menu
+      :default-active="activeIndex2"
+      class="el-menu-demo"
+      mode="horizontal"
+      @select="handleSelect"
+      background-color="#545c64"
+      text-color="#fff"
+      active-text-color="#ffd04b"
+  >
+    <el-menu-item index="1">处理中心</el-menu-item>
+    <el-sub-menu index="2">
+      <template #title>我的工作台</template>
+      <el-menu-item index="2-1">选项1</el-menu-item>
+      <el-menu-item index="2-2">选项2</el-menu-item>
+      <el-menu-item index="2-3">选项3</el-menu-item>
+      <el-sub-menu index="2-4">
+        <template #title>选项4</template>
+        <el-menu-item index="2-4-1">选项1</el-menu-item>
+        <el-menu-item index="2-4-2">选项2</el-menu-item>
+        <el-menu-item index="2-4-3">选项3</el-menu-item>
+      </el-sub-menu>
+    </el-sub-menu>
+    <el-menu-item index="3" disabled>消息中心</el-menu-item>
+    <el-menu-item index="4">订单管理</el-menu-item>
+  </el-menu>
 </template>
-
 <script setup>
-// 引入组件
-import {ref, reactive, onMounted} from 'vue'
-import Test from '@/components/Test.vue';
-// 定义变量
-const name = ref('张三')
-const state = reactive({count: 0})
-// 定义方法
-const valueAdd = () => {
-  state.count++
-}
-// 获取子组件的传值
-const toFather = (value) => {
-  alert('父组件收到子组件的传值:' + value)
-}
-</script>
+import {ref} from "vue";
+import {ElMenuItem, ElSubMenu, ElMenu} from 'element-plus'
 
-<style scoped>
-a {
-  color: #42b983;
-}
-</style>
+const activeIndex = ref('1');
+const activeIndex2 = ref('1');
+const handleSelect = (key, keyPath) => {
+  console.log(key, keyPath);
+};
+</script>

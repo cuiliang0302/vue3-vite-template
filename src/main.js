@@ -4,6 +4,7 @@ import router from '@/router';
 import store from '@/store';
 import '@/assets/style/index.scss'
 import ElementPlus from '@/plugins/ElementPlus'
+import 'element-plus/dist/index.css'
 
 const app = createApp(App)
 app.use(router)
