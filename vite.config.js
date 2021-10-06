@@ -1,14 +1,14 @@
 import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import VitePluginElementPlus from 'vite-plugin-element-plus'
-import path from "path";
+import {resolve} from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({mode}) => {
 	return {
 		resolve: {
 			alias: {
-				'@': path.resolve(__dirname, 'src')
+				'@': resolve(__dirname, 'src')
 			}
 		},
 		plugins: [
@@ -24,10 +24,10 @@ export default defineConfig(({mode}) => {
 		css: {
 			preprocessorOptions: {
 				scss: {
-					additionalData: '@use "./src/assets/style/variable.scss" as *;'
+					additionalData: '@import "./src/assets/style/variable.scss";'
 				}
 			}
-		},
+		}
 	}
 })
 
