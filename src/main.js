@@ -1,13 +1,16 @@
-import {createApp} from 'vue'
-import App from './App.vue'
+import {createApp} from "vue";
+import App from "./App.vue";
+import "@/styles/normalize.css";
+import "@/styles/hover-min.css";
+import "@/styles/index.scss";
+import "element-plus/theme-chalk/src/message.scss"
 import router from '@/router';
 import store from '@/store';
-import '@/assets/style/index.scss'
-import ElementPlus from '@/plugins/ElementPlus'
-import 'element-plus/dist/index.css'
+import 'vue-loaders/dist/vue-loaders.css';
+import VueLoaders from 'vue-loaders';
 
-const app = createApp(App)
+const app = createApp(App);
 app.use(router)
 app.use(store)
-app.use(ElementPlus)
-app.mount('#app')
+app.use(VueLoaders)
+app.mount("#app");

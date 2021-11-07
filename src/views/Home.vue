@@ -1,14 +1,13 @@
 <template>
-  <HelloWorld></HelloWorld>
+  <HelloWorld :msg="'123'"></HelloWorld>
   <h1>这是首页</h1>
-  <button @click="valueAdd">{{ value }}</button>
-  <el-button type="primary">主要按钮</el-button>
+  <h3>{{ value }}</h3>
+  <el-button type="primary" @click="valueAdd">主要按钮</el-button>
 </template>
 
 <script setup>
 import HelloWorld from '@/components/HelloWorld.vue'
 import store from '@/store/index'
-import {ElButton} from 'element-plus'
 import {computed, onMounted} from "vue";
 
 const value = computed(() => store.state.count)
@@ -23,6 +22,6 @@ onMounted(() => {
 <style scoped lang="scss">
 
 h1 {
-  color: $color-primary;
+  color: $define-color-primary;
 }
 </style>

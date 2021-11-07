@@ -1,33 +1,42 @@
 <template>
-  <h1>这是子组件，名字叫{{ name }}</h1>
-  <p>父组件给子组件传的值是————>{{ msg }}——{{ status }}</p>
-  <button type="button" @click="toFather">
-    向父组件传值
-  </button>
+  <h1>这是测试页</h1>
+  <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
+    <li v-for="i in count" :key="i" class="infinite-list-item">{{ i }}</li>
+  </ul>
+
 </template>
 
 <script setup>
-// 引入组件
 import {ref} from "vue";
-// 定义变量
-const name = ref('李四')
-// 组件属性参数(子组件接收父组件传值)
-const props = defineProps({
-  msg: String,
-  // 参数校验与默认值
-  status: {
-    type: String,
-    required: false,
-    default: '未定义',
-  },
-})
-// 定义事件(子组件向父组件传参)
-const emit = defineEmit(['toFather']);
-const toFather = () => {
-  emit('toFather', '112233');
+
+const count = ref(0)
+const load = () => {
+  count.value += 2
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+h1{
+  color: $define-color-primary;
+}
+.infinite-list {
+  height: 300px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
 
+  .infinite-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    background: var(--el-color-primary-light-9);
+    margin: 10px;
+    color: var(--el-color-primary);
+
+    & + .list-item {
+      margin-top: 10px;
+    }
+  }
+}
 </style>

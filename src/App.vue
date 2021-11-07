@@ -1,18 +1,17 @@
 <template>
-  <!-- 路由匹配到的组件将渲染在这里 -->
-  <router-view></router-view>
+  <el-config-provider :locale="locale">
+    <router-view v-slot="{ Component }">
+      <component :is="Component"/>
+    </router-view>
+  </el-config-provider>
 </template>
 
 <script setup>
+import zhCn from 'element-plus/lib/locale/lang/zh-cn'
+
+const locale = zhCn
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
