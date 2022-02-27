@@ -21,7 +21,4 @@ onMounted(() => {
 
 <style scoped lang="scss">
 
-h1 {
-  color: $define-color-primary;
-}
 </style>

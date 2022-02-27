@@ -1,4 +1,4 @@
-# vite2-vue3
+# vue3 + vite + element plus
 
 ## Project setup
 ```
