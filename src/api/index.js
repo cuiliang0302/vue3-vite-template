@@ -6,7 +6,14 @@ const index = {
 			method: 'get',
 			url: url
 		}
-		if (params) config.params = params
+		if (params) {
+			for (let key in params) {
+				if (params[key].length === 0) {
+					delete params[key]
+				}
+			}
+			config.params = params
+		}
 		return request(config)
 	},
 	getFile(url, params) {
