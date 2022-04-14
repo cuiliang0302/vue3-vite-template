@@ -1,14 +1,19 @@
 import axios from 'axios'
-import { ElMessageBox} from 'element-plus'
+import {ElMessage} from 'element-plus'
+import store from "@/store/index";
+
 export function request(config) {
+	const token = store.state.token
 	// 创建axios的实例
 	const instance = axios.create({
 		baseURL: import.meta.env.VITE_APP_BASE_URL,
-		timeout: 20000
+		timeout: 2 * 60 * 1000
 	})
 	// 请求拦截器配置
 	instance.interceptors.request.use(config => {
-			// config.headers.Authorization = window.sessionStorage.getItem('token')
+			if (token) {
+				config.headers.Authorization = 'Bearer ' + token
+			}
 			return config
 		}, error => {
 			console.log(error)
@@ -20,33 +25,34 @@ export function request(config) {
 		return response.data
 	}, error => {
 		console.log(error)
-		if(error.response){
+		if (error.response) {
 			switch (error.response.status) {
 				case 400:
 					return Promise.reject(error.response.data)
 				case 401:
 					console.log("无权访问")
+					ElMessage.error('对不起，您暂无权限访问此接口，请登录重试！')
 					break
 				case 403:
 					console.log("token过期啦")
+					ElMessage.error('对不起，您的身份信息已过期，请重新登录！')
+					window.location.href="#";
 					break
 				case 404:
 					console.log("404啦")
+					ElMessage.error('请求地址异常，请稍候重试或联系管理员！')
 					break
 				case 500:
 					console.log("500啦")
-					ElMessageBox.alert('后端接口异常，请稍候重试或联系管理员！', '异常提示', {
-						confirmButtonText: '确定'
-					})
+					ElMessage.error('后端接口异常，请稍候重试！')
 					break
 				default:
 					return Promise.reject(error)
 			}
-		}else {
-			console.log("请求超时")
-			ElMessageBox.alert('请求超时，请稍候重试或联系管理员！', '异常提示', {
-				confirmButtonText: '确定'
-			})
+		}
+		else {
+			console.log("请求异常")
+			ElMessage.error('请求超时，检查网络状态或刷新重试！')
 		}
 		return Promise.reject(error)
 	})

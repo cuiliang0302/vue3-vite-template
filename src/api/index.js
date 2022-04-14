@@ -6,14 +6,7 @@ const index = {
 			method: 'get',
 			url: url
 		}
-		if (params) {
-			for (let key in params) {
-				if (params[key].length === 0) {
-					delete params[key]
-				}
-			}
-			config.params = params
-		}
+		if (params) config.params = params
 		return request(config)
 	},
 	getFile(url, params) {
@@ -36,6 +29,14 @@ const index = {
 	put(url, params) {
 		const config = {
 			method: 'put',
+			url: url
+		}
+		if (params) config.data = params
+		return request(config)
+	},
+	patch(url, params) {
+		const config = {
+			method: 'patch',
 			url: url
 		}
 		if (params) config.data = params
