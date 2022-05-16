@@ -1,5 +1,5 @@
 # vue3 + vite + element plus
-
+PC前端项目初始化模板
 ## Project setup
 ```
 npm install

@@ -1,11 +1,9 @@
-FROM node:14.17.6 AS build
+FROM node:16.15.0 AS build
 COPY . /opt/vue
-RUN rm -rf /opt/vue/node_modules
 WORKDIR /opt/vue
-RUN npm install
-RUN npm run build
+RUN npm install && npm run build
 
-FROM nginx:1.20.1
+FROM nginx:1.20.2
 COPY --from=build /opt/vue/dist /opt/vue/dist
 COPY nginx.conf /etc/nginx/nginx.conf
 CMD ["nginx", "-g","daemon off;"]
