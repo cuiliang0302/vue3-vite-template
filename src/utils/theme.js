@@ -10,6 +10,7 @@ function theme() {
   // 切换主题色
   const setTheme = (value) => {
     console.log("theme.js", value)
+
   }
   onMounted(() => {
   })
