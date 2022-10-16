@@ -1,5 +1,4 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import store from '@/store/index'
 const router = createRouter({
 	// history: createWebHashHistory(),  // hash模式，
 	history: createWebHistory(),  //h5模式createWebHistory

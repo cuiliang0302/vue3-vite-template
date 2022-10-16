@@ -1,9 +1,8 @@
 import axios from 'axios'
 import {ElMessage} from 'element-plus'
-import store from "@/store/index";
 
 export function request(config) {
-	const token = store.state.token
+	// const token = store.state.token
 	// 创建axios的实例
 	const instance = axios.create({
 		baseURL: import.meta.env.VITE_APP_BASE_URL,
@@ -11,9 +10,9 @@ export function request(config) {
 	})
 	// 请求拦截器配置
 	instance.interceptors.request.use(config => {
-			if (token) {
-				config.headers.Authorization = 'Bearer ' + token
-			}
+			// if (token) {
+			// 	config.headers.Authorization = 'Bearer ' + token
+			// }
 			return config
 		}, error => {
 			console.log(error)
