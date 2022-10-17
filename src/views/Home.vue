@@ -4,7 +4,7 @@
   <el-button type="primary" @click="valueAdd">数值+1</el-button>
   <h3>{{ count }} {{themeName}}</h3>
   <h2>主题换肤</h2>
-  <el-radio-group v-model="themeName" size="large" @change="changeColor">
+  <el-radio-group :model-value="themeName" size="large" @change="changeColor">
     <el-radio-button label="拂晓蓝(默认)" />
     <el-radio-button label="薄暮红"/>
     <el-radio-button label="火山橘"/>

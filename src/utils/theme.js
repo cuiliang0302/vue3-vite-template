@@ -7,10 +7,12 @@ import {getThemeValue} from "@/utils/color";
 
 // 切换主题色
 export function setTheme(value) {
+  let { theme } = useStore();
   console.log("theme.js", value)
   const el = ref(null)
   const primary_color = useCssVar('--el-color-primary', el)
   primary_color.value = getThemeValue(value)
+  theme.changeTheme(value)
 }
 
 // 首次加载时换肤
