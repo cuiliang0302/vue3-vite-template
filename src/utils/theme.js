@@ -1,22 +1,24 @@
 // 主题换肤
-import {onMounted} from "vue";
+import {onMounted, ref} from "vue";
 import {storeToRefs} from "pinia";
 import useStore from "@/store";
+import {useCssVar} from "@vueuse/core";
+import {getThemeValue} from "@/utils/color";
 
-function theme() {
-  const {theme} = useStore()
-  // 当前主题色
-  const {themeName} = storeToRefs(theme)
-  // 切换主题色
-  const setTheme = (value) => {
-    console.log("theme.js", value)
+const {theme} = useStore()
+// 获取当前主题色
+export const {themeName} = storeToRefs(theme)
 
-  }
-  onMounted(() => {
-  })
-  return {
-    themeName, setTheme,
-  }
+// 切换主题色
+export function setTheme(value) {
+  console.log("theme.js", value)
+  const el = ref(null)
+  const primary_color = useCssVar('--el-color-primary', el)
+  primary_color.value = getThemeValue(value)
 }
 
-export default theme
+// 首次加载时换肤
+export function onloadTheme() {
+  console.log("首次加载了啊")
+  setTheme(getThemeValue(themeName))
+}
