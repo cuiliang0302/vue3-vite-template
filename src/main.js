@@ -4,6 +4,7 @@ import "@/styles/normalize.css";
 import "@/styles/hover-min.css";
 import "@/styles/index.scss";
 import "element-plus/theme-chalk/src/message.scss"
+import 'element-plus/theme-chalk/dark/css-vars.css'
 import router from '@/router';
 import { createPinia } from 'pinia';
 import 'vue-loaders/dist/vue-loaders.css';
