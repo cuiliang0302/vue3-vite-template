@@ -2,7 +2,7 @@ import {defineStore} from 'pinia'
 // 主题换肤
 const useDarkStore = defineStore('dark', {
   state: () => ({
-    isDark: true,
+    isDark: '',
   }),
   // 计算属性
   getters: {},

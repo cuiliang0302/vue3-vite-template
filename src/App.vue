@@ -10,10 +10,12 @@
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import {onMounted, ref} from "vue";
 import {onloadTheme} from "@/utils/theme";
+import {onloadDark} from "@/utils/dark";
 
 const locale = ref(zhCn)
 onMounted(() => {
   onloadTheme()
+  onloadDark()
 })
 </script>
 

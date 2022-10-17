@@ -54,7 +54,7 @@ const changeDark = (value) => {
   setDark(value)
 }
 onMounted(() => {
-  console.log("执行onMounted函数")
+  // console.log("执行onMounted函数")
 });
 </script>
 
