@@ -1,12 +1,10 @@
-import { defineStore } from 'pinia'
+import {defineStore} from 'pinia'
 
 const useUserStore = defineStore('user', {
-  state: () => {
-    return {
-      name: 'zs',
-      age: 100,
-    }
-  },
+  state: () => ({
+    name: 'zs',
+    age: 100,
+  })
 })
 
 export default useUserStore

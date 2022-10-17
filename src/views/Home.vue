@@ -2,7 +2,7 @@
   <HelloWorld :msg="'123'"></HelloWorld>
   <h1>这是首页</h1>
   <el-button type="primary" @click="valueAdd">数值+1</el-button>
-  <h3>{{ count }} {{ themeName }}</h3>
+  <h3>当前值：{{ count }}</h3>
   <h2>主题换肤</h2>
   <el-radio-group :model-value="themeName" size="large" @change="changeColor">
     <el-radio-button label="拂晓蓝(默认)"/>
