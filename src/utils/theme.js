@@ -15,7 +15,7 @@ export function setTheme(value) {
 
 // 首次加载时换肤
 export function onloadTheme() {
-  const { theme } = useStore
+  let { theme } = useStore();
   const { themeName } = storeToRefs(theme)
   console.log("首次加载了啊",themeName.value)
   setTheme(themeName.value)

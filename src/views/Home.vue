@@ -22,7 +22,7 @@ import { setTheme } from '@/utils/theme'
 import useStore from "@/store";
 import {storeToRefs} from "pinia";
 // demo
-const {demo,theme} = useStore
+const {demo,theme} = useStore()
 const {count} = storeToRefs(demo)
 const {themeName} = storeToRefs(theme)
 const valueAdd = () => {
