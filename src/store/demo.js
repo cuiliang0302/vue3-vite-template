@@ -3,11 +3,9 @@ import {defineStore} from 'pinia'
 // 参数1：store的唯一表示
 // 参数2：对象，可以提供state actions getters
 const useDemoStore = defineStore('demo', {
-  state: () => {
-    return {
-      count: 0,
-    }
-  },
+  state: () => ({
+    count: 0,
+  }),
   // 计算属性
   getters: {
     // 计算数据翻倍值

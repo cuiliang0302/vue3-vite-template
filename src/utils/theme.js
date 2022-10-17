@@ -1,11 +1,11 @@
 // 主题换肤
 import {onMounted, ref} from "vue";
 import {storeToRefs} from "pinia";
-import useStore from "@/store";
+import useThemeStore from "@/store/theme";
 import {useCssVar} from "@vueuse/core";
 import {getThemeValue} from "@/utils/color";
 
-const {theme} = useStore()
+const theme = useThemeStore()
 // 获取当前主题色
 export const {themeName} = storeToRefs(theme)
 

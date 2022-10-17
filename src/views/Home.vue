@@ -19,10 +19,10 @@
 import HelloWorld from '@/components/HelloWorld.vue'
 import {onMounted, ref} from "vue";
 import {themeName, setTheme} from '@/utils/theme'
-import useStore from "@/store";
+import useDemoStore from "@/store/demo";
 import {storeToRefs} from "pinia";
 // demo
-const {demo} = useStore()
+const demo = useDemoStore()
 const {count} = storeToRefs(demo)
 const valueAdd = () => {
   demo.add()

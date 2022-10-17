@@ -1,12 +1,9 @@
-import useUserStore from '@/store/user'
-import useDemoStore from '@/store/demo'
-import useThemeStore from "@/store/theme";
+import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
-// 统一导出useStore方法
-export default function useStore() {
-  return {
-    user: useUserStore(),
-    demo: useDemoStore(),
-    theme: useThemeStore()
-  }
-}
+
+const pinia = createPinia();
+// piniaPersist(持久化)
+pinia.use(piniaPluginPersistedstate);
+
+export default pinia;
