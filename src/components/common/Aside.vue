@@ -1,16 +1,20 @@
 <template>
-  <h1>这是测试页</h1>
-  <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
-    <el-radio-button :label="false">expand</el-radio-button>
-    <el-radio-button :label="true">collapse</el-radio-button>
-  </el-radio-group>
   <el-menu
-      default-active="2"
-      class="el-menu-vertical-demo"
-      :collapse="isCollapse"
+      :default-active="'1'"
+      class="el-menu-vertical"
       @open="handleOpen"
       @close="handleClose"
+      background-color="#1e263b"
+      text-color="#fff"
+      active-text-color="#3498db"
+      :collapse="isCollapse"
   >
+    <div class="logo" @click="changeCollapse">
+      <el-icon>
+        <elemeFilled/>
+      </el-icon>
+      <span v-if="!isCollapse">系统名称</span>
+    </div>
     <el-menu-item index="1" @click="router.push('/')">
       <el-icon>
         <home-filled/>
@@ -57,20 +61,59 @@
 </template>
 
 <script setup>
-import {HomeFilled, BellFilled, TrendCharts, Opportunity, Tools, ElemeFilled} from "@element-plus/icons-vue"
 import {ref} from "vue";
+import {useRouter} from "vue-router";
+import {HomeFilled, BellFilled, TrendCharts, Opportunity, Tools, ElemeFilled} from "@element-plus/icons-vue"
+import useStore from "@/store";
+import {storeToRefs} from "pinia";
 
-const isCollapse = ref(true)
+const router = useRouter()
+const {aside} = useStore()
+// 导航栏默认不折叠
+const {isCollapse} = storeToRefs(aside);
+// 导航栏折叠事件
+const changeCollapse = () => {
+  console.log(!isCollapse.value)
+  // setCollapse(!isCollapse.value)
+  aside.changeCollapse(!isCollapse.value)
+};
 const handleOpen = (key, keyPath) => {
-  console.log(key, keyPath)
-}
+  console.log(key, keyPath);
+};
 const handleClose = (key, keyPath) => {
-  console.log(key, keyPath)
-}
+  console.log(key, keyPath);
+};
 </script>
 
 <style scoped lang="scss">
-.el-menu-vertical-demo:not(.el-menu--collapse){
+.logo {
+  margin-left: 15px;
+  height: 60px;
+  color: white;
+  background-color: #171d23;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  i {
+    font-size: 35px;
+  }
+
+  span {
+    margin-left: 10px;
+  }
+}
+
+.el-menu {
+  height: 100vh;
+}
+
+.el-icon {
+  font-size: 20px;
+  margin-right: 5px;
+}
+.el-menu-vertical:not(.el-menu--collapse) {
   width: 250px;
+  min-height: 400px;
 }
 </style>
