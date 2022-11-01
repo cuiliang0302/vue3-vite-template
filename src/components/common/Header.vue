@@ -1,25 +1,25 @@
 <template>
-    <div>
-      <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item v-for="item in location">{{ item }}</el-breadcrumb-item>
-      </el-breadcrumb>
-    </div>
-    <div>
-      <el-dropdown>
+  <div>
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item v-for="item in location">{{ item }}</el-breadcrumb-item>
+    </el-breadcrumb>
+  </div>
+  <div>
+    <el-dropdown>
         <span class="el-dropdown-link">
           admin
           <el-icon class="el-icon--right">
             <arrow-down/>
           </el-icon>
         </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>修改密码</el-dropdown-item>
-            <el-dropdown-item>注销登录</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </div>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item>修改密码</el-dropdown-item>
+          <el-dropdown-item>注销登录</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
+  </div>
 </template>
 
 <script setup>
@@ -40,10 +40,11 @@ onBeforeRouteUpdate((to) => {
 </script>
 
 <style scoped lang="scss">
-div:nth-child(1){
+div:nth-child(1) {
   flex: 1;
 }
-div:nth-child(2){
+
+div:nth-child(2) {
   width: 100px;
 }
 </style>

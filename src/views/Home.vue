@@ -8,7 +8,9 @@
         <Header></Header>
       </el-header>
       <el-main>
-        <router-view></router-view>
+        <el-card shadow="never">
+          <router-view></router-view>
+        </el-card>
       </el-main>
     </el-container>
   </el-container>
