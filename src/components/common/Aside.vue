@@ -87,7 +87,7 @@ const handleClose = (key, keyPath) => {
 
 <style scoped lang="scss">
 .logo {
-  margin-left: 15px;
+  padding-left: 15px;
   height: 60px;
   color: white;
   background-color: #171d23;

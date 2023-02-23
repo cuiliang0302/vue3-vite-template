@@ -19,9 +19,19 @@ const router = createRouter({
           component: () => import('@/views/Index.vue'),
           meta: {
             title: '系统主页',
-            location: ['系统主页','测试路由'],
+            location: ['系统主页', '测试路由'],
           },
-        }]
+        },
+        {
+          path: 'table',
+          name: 'table',
+          component: () => import('@/views/Table.vue'),
+          meta: {
+            title: '系统主页',
+            location: ['系统主页', '测试表格'],
+          },
+        }
+      ]
     },
     {
       path: '/test',
