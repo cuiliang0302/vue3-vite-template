@@ -7,7 +7,7 @@
   <div>
     <el-dropdown>
         <span class="el-dropdown-link">
-          admin
+          {{ username }}
           <el-icon class="el-icon--right">
             <arrow-down/>
           </el-icon>
@@ -15,7 +15,7 @@
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item>修改密码</el-dropdown-item>
-          <el-dropdown-item>注销登录</el-dropdown-item>
+          <el-dropdown-item @click="logout">注销登录</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -26,10 +26,25 @@
 import {onBeforeRouteUpdate, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import {ArrowDown} from '@element-plus/icons-vue'
+import useStore from "@/store";
+import {storeToRefs} from "pinia";
+import {ElMessage} from "element-plus";
 
+const {user} = useStore();
+const {username} = storeToRefs(user);
 const router = useRouter()
 // 当前位置
 const location = ref([])
+// 注销登录
+const logout = () => {
+  ElMessage.success({
+    message: '注销成功，正在跳转至登录页！',
+    type: 'success',
+  })
+  localStorage.clear()
+  sessionStorage.clear()
+  router.replace('/login')
+}
 onMounted(() => {
   location.value = router.currentRoute.value.meta.location
 })

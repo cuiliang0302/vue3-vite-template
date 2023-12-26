@@ -1,50 +1,66 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
 const router = createRouter({
-  // history: createWebHashHistory(),  // hash模式，
-  history: createWebHistory(),  //h5模式createWebHistory
-  routes: [
-    {
-      path: '/',
-      name: 'Home',
-      component: () => import('@/views/Home.vue'),
-      children: [
+    // history: createWebHashHistory(),  // hash模式，
+    history: createWebHistory(),  //h5模式createWebHistory
+    routes: [
         {
-          path: "",
-          redirect: "/index"
+            path: "",
+            name: "redirect",
+            redirect: "/login"
         },
         {
-          path: 'index',
-          name: 'Index',
-          component: () => import('@/views/Index.vue'),
-          meta: {
-            title: '系统主页',
-            location: ['系统主页', '测试路由'],
-          },
+            path: '/login',
+            component: () => import('@/views/Login.vue'),
+            meta: {
+                title: '登录',
+            }
         },
         {
-          path: 'table',
-          name: 'table',
-          component: () => import('@/views/Table.vue'),
-          meta: {
-            title: '系统主页',
-            location: ['系统主页', '测试表格'],
-          },
+            path: '/',
+            name: 'Home',
+            component: () => import('@/views/Home.vue'),
+            children: [
+                {
+                    path: 'index',
+                    name: 'index',
+                    component: () => import('@/views/Index.vue'),
+                    meta: {
+                        title: '首页',
+                    },
+                },
+                {
+                    path: 'demo',
+                    name: 'demo',
+                    component: () => import('@/views/Demo.vue'),
+                    meta: {
+                        title: '演示页面',
+                        location: ['示例页', '演示页面'],
+                    },
+                },
+                {
+                    path: 'tables',
+                    name: 'tables',
+                    component: () => import('@/views/Tables.vue'),
+                    meta: {
+                        title: '演示表格',
+                        location: ['示例页', '演示表格'],
+                    },
+                }
+            ]
+        },
+        {
+            path: '/test',
+            component: () => import('@/views/Test.vue'),
+            meta: {
+                title: '测试',
+            }
         }
-      ]
-    },
-    {
-      path: '/test',
-      component: () => import('@/views/Test.vue'),
-      meta: {
-        title: '测试',
-      }
-    }
-  ]
+    ]
 })
 // 路由导航守卫
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title
-  next()
+    document.title = to.meta.title
+    next()
 })
 export default router;

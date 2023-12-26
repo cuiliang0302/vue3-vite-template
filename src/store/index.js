@@ -2,7 +2,7 @@ import useUserStore from '@/store/user'
 import useDemoStore from '@/store/demo'
 import useThemeStore from "@/store/theme";
 import useDarkStore from "@/store/dark";
-import useAsideStore from "@/store/aside";
+import useCommonStore from '@/store/common'
 
 // 统一导出useStore方法
 export default function useStore() {
@@ -11,6 +11,6 @@ export default function useStore() {
     demo: useDemoStore(),
     theme: useThemeStore(),
     dark: useDarkStore(),
-    aside: useAsideStore()
+    common: useCommonStore(),
   }
 }

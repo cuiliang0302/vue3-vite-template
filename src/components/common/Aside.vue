@@ -1,9 +1,7 @@
 <template>
   <el-menu
-      :default-active="'1'"
+      :default-active="menuName"
       class="el-menu-vertical"
-      @open="handleOpen"
-      @close="handleClose"
       background-color="#1e263b"
       text-color="#fff"
       active-text-color="#3498db"
@@ -15,74 +13,48 @@
       </el-icon>
       <span v-if="!isCollapse">系统名称</span>
     </div>
-    <el-menu-item index="1" @click="router.push('/')">
+    <el-menu-item index="index" @click="router.push('/')">
       <el-icon>
         <home-filled/>
       </el-icon>
-      <template #title><span>菜单1</span></template>
+      <template #title><span>首页</span></template>
     </el-menu-item>
     <el-sub-menu index="2">
       <template #title>
         <el-icon>
           <trend-charts/>
         </el-icon>
-        <span>菜单2</span>
+        <span>示例页</span>
       </template>
-      <el-menu-item index="2-1" @click="router.push('/')">菜单2-1</el-menu-item>
-      <el-menu-item index="2-2" @click="router.push('/')">菜单2-2</el-menu-item>
-    </el-sub-menu>
-    <el-sub-menu index="3">
-      <template #title>
-        <el-icon>
-          <opportunity/>
-        </el-icon>
-        <span>菜单3</span>
-      </template>
-      <el-menu-item index="3-1" @click="router.push('/')">菜单3-1</el-menu-item>
-      <el-menu-item index="3-2" @click="router.push('/')">菜单3-2</el-menu-item>
-    </el-sub-menu>
-    <el-menu-item index="4" @click="router.push('/alert')">
-      <el-icon>
-        <bell-filled/>
-      </el-icon>
-      <template #title><span>菜单4</span></template>
-    </el-menu-item>
-    <el-sub-menu index="5">
-      <template #title>
-        <el-icon>
-          <tools/>
-        </el-icon>
-        <span>菜单5</span>
-      </template>
-      <el-menu-item index="5-1" @click="router.push('/')">菜单5-1</el-menu-item>
-      <el-menu-item index="5-2" @click="router.push('/')">菜单5-2</el-menu-item>
+      <el-menu-item index="demo" @click="router.push('/demo')">演示页面</el-menu-item>
+      <el-menu-item index="tables" @click="router.push('/tables')">演示表格</el-menu-item>
+      <el-menu-item index="test" @click="router.push('/test')">测试页</el-menu-item>
     </el-sub-menu>
   </el-menu>
 </template>
 
 <script setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import {HomeFilled, BellFilled, TrendCharts, Opportunity, Tools, ElemeFilled} from "@element-plus/icons-vue"
+import {HomeFilled, TrendCharts, ElemeFilled} from "@element-plus/icons-vue"
 import useStore from "@/store";
 import {storeToRefs} from "pinia";
 
 const router = useRouter()
-const {aside} = useStore()
+const {common} = useStore()
 // 导航栏默认不折叠
-const {isCollapse} = storeToRefs(aside);
+const {isCollapse} = storeToRefs(common);
 // 导航栏折叠事件
 const changeCollapse = () => {
   console.log(!isCollapse.value)
   // setCollapse(!isCollapse.value)
-  aside.changeCollapse(!isCollapse.value)
+  common.changeCollapse(!isCollapse.value)
 };
-const handleOpen = (key, keyPath) => {
-  console.log(key, keyPath);
-};
-const handleClose = (key, keyPath) => {
-  console.log(key, keyPath);
-};
+// 当前激活的菜单名称
+const menuName = ref('')
+onMounted(() => {
+  menuName.value = router.currentRoute.value.name
+})
 </script>
 
 <style scoped lang="scss">
@@ -113,7 +85,7 @@ const handleClose = (key, keyPath) => {
   margin-right: 5px;
 }
 .el-menu-vertical:not(.el-menu--collapse) {
-  width: 250px;
+  width: 220px;
   min-height: 400px;
 }
 </style>

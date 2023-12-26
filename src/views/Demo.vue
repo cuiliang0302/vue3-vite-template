@@ -1,7 +1,7 @@
 <template>
   <HelloWorld :msg="'123'"></HelloWorld>
   <el-card>
-    <h1>这是首页</h1>
+    <h1>这是演示页包含深色模式和主题换肤功能</h1>
     <el-button type="primary" @click="valueAdd">数值+1</el-button>
     <h3>当前值：{{ count }}</h3>
   </el-card>
