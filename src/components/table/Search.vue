@@ -1,21 +1,21 @@
 <template>
   <el-card shadow="hover" class="search-card">
-    <el-form ref="searchFormRef" :inline="true" :model="from">
+    <el-form ref="searchFormRef" :inline="true" :model="form">
     <span v-for="(item,index) in fieldConfig" :key="index">
       <el-form-item v-if="item.type==='input'" :label="item.label">
-        <el-input v-model="from[item.model]" :placeholder="item.placeholder"/>
+        <el-input v-model="form[item.model]" :placeholder="item.placeholder"/>
       </el-form-item>
       <el-form-item v-if="item.type==='select'" :label="item.label">
-        <el-select v-model="from[item.model]" :placeholder="item.placeholder">
-          <el-option v-for="(itemOption,indexOption) in selectOption" :key="indexOption"
+        <el-select v-model="form[item.model]" :placeholder="item.placeholder">
+          <el-option v-for="(itemOption,indexOption) in selectOption[item.model]" :key="indexOption"
                      :label="itemOption.label" :value="itemOption.value"/>
         </el-select>
       </el-form-item>
       <el-form-item v-if="item.type==='auto-input'" :label="item.label">
-        <AutoInput :field="item.model" v-model="from[item.model]"></AutoInput>
+        <AutoInput :field="item.model" v-model="form[item.model]"></AutoInput>
       </el-form-item>
       <el-form-item v-if="item.type==='date'" :label="item.label">
-        <el-date-picker v-model="from[item.model]" type="date" :placeholder="item.placeholder"/>
+        <el-date-picker v-model="form[item.model]" type="date" :placeholder="item.placeholder"/>
       </el-form-item>
       <el-form-item v-if="item.type==='datetime-range'" :label="item.label">
         <el-date-picker
@@ -60,9 +60,9 @@ const props = defineProps({
     default: []
   },// 表单配置
   selectOption: {
-    type: Array,
+    type: Object,
     required: false,
-    default: []
+    default: {}
   }// 选择框选项
 })
 // 日期时间范围选择器
@@ -70,13 +70,13 @@ const dateTimeRange = ref('')
 // 搜索表单对象
 const searchFormRef = ref(null)
 // 搜索表单
-let from = reactive({})
+let form = reactive({})
 // 搜索项配置
 let fieldConfig = ref([])
 watch(
-    () => from.value,
+    () => form.value,
     (newValue) => {
-      from = newValue
+      form = newValue
     }, {
       deep: true,
     }
@@ -84,13 +84,13 @@ watch(
 // 提交搜索
 const onSubmit = () => {
   // console.log(dateTimeRange.value)
-  console.log(from)
-  emits('submitSearch', from);
+  console.log(form)
+  emits('submitSearch', form);
 }
 // 表单清空
 const reset = () => {
-  for (const key in from) {
-    from[key] = ''
+  for (const key in form) {
+    form[key] = ''
   }
   dateTimeRange.value = ''
 }
@@ -108,7 +108,7 @@ onMounted(() => {
   for (let j in fieldConfig.value) {
     if (fieldConfig.value[j].type === 'date') {
       // console.log(fieldConfig.value[j])
-      from['date'] = new Date()
+      form['date'] = new Date()
     }
   }
 })

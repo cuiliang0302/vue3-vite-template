@@ -12,7 +12,7 @@
           </el-form-item>
           <el-form-item v-if="item.type==='select'" :label="item.label" :prop="item.model">
             <el-select v-model="from[item.model]" :placeholder="item.placeholder">
-              <el-option v-for="(itemOption,indexOption) in selectOption" :key="indexOption"
+              <el-option v-for="(itemOption,indexOption) in selectOption[item.model]" :key="indexOption"
                          :label="itemOption.label" :value="itemOption.value"/>
             </el-select>
           </el-form-item>
@@ -25,6 +25,10 @@
                 type="datetime"
                 :placeholder="item.placeholder"
             />
+          </el-form-item>
+          <el-form-item v-if="item.type==='date'" :label="item.label" :prop="item.model">
+            <el-date-picker v-model="from[item.model]" type="date" :placeholder="item.placeholder"
+                            value-format="YYYY-MM-DD"/>
           </el-form-item>
         </span>
       <slot name="item"></slot>
@@ -57,9 +61,9 @@ const props = defineProps({
     default: []
   },// 表单配置
   selectOption: {
-    type: Array,
+    type: Object,
     required: false,
-    default: []
+    default: {}
   }// 选择框选项
 })
 // 添加表单对象

@@ -2,11 +2,10 @@
   <Search :fieldConfig="fieldConfig" @submitSearch="submitSearch" :selectOption="selectOption"></Search>
   <List :data="tableData" :fieldConfig="fieldConfig" :tableConfig="tableConfig"
         @pageSize="pageSize" @pageNumber="pageNumber" :tag="tagConfig"
-        @submitEdit="submitEdit" @submitShow="submitShow" @submitAdd="submitAdd" @submitDelete="submitDelete"
-  ></List>
+        @submitEdit="submitEdit" @submitShow="submitShow" @submitAdd="submitAdd" @submitDelete="submitDelete"></List>
   <Show :data="operateForm" :fieldConfig="fieldConfig"></Show>
-  <Edit :data="operateForm" :fieldConfig="fieldConfig" @editData="editData"></Edit>
-  <Add :fieldConfig="fieldConfig" @addData="addData"></Add>
+  <Edit :data="operateForm" :fieldConfig="fieldConfig" @editData="editData" :selectOption="selectOption"></Edit>
+  <Add :fieldConfig="fieldConfig" @addData="addData" :selectOption="selectOption"></Add>
 </template>
 
 <script setup name="tables">
@@ -48,6 +47,17 @@ const fieldConfig = ref([
     'model': 'province',// 字段名
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
+    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
+    'is_edit': false,// 是否可以编辑修改
+    'placeholder': '请选择省份', // 提示文字
+    'is_required': false,// 编辑表单时，是否必填
+  },
+  {
+    'type': 'select',// 表单类型
+    'label': '省份', // 标签
+    'model': 'province_id',// 字段名
+    'is_table_show': false,// 是否在表格显示
+    'is_info_show': false,// 是否在详情显示
     'is_search': true,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请选择省份', // 提示文字
@@ -58,44 +68,55 @@ const fieldConfig = ref([
     'label': '性别', // 标签
     'model': 'sex',// 字段名
     'is_table_show': true,// 是否在表格显示
-    'is_info_show': true,// 是否在详情显示
+    'is_info_show': false,// 是否在详情显示
     'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
-    'placeholder': '请输入secret', // 提示文字
-    'is_required': true,// 编辑表单时，是否必填
+    'placeholder': '请选择性别', // 提示文字
+    'is_required': false,// 编辑表单时，是否必填
   },
   {
-    'type': 'input',// 表单类型
+    'type': 'select',// 表单类型
+    'label': '性别', // 标签
+    'model': 'sex_name',// 字段名
+    'is_table_show': false,// 是否在表格显示
+    'is_info_show': true,// 是否在详情显示
+    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
+    'is_edit': false,// 是否可以编辑修改
+    'placeholder': '请选择性别', // 提示文字
+    'is_required': false,// 编辑表单时，是否必填
+  },
+  {
+    'type': 'date',// 表单类型
     'label': '生日', // 标签
     'model': 'birthday',// 字段名
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
     'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
-    'placeholder': '请输入备注信息', // 提示文字
+    'placeholder': '请输入生日', // 提示文字
     'is_required': false,// 编辑表单时，是否必填
-    'width': 130
+    'width': 135
   },
   {
     'type': 'input',// 表单类型
-    'label': '身高', // 标签
+    'label': '身高(m)', // 标签
     'model': 'height',// 字段名
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
     'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
-    'placeholder': '请输入备注信息', // 提示文字
+    'placeholder': '请输入身高', // 提示文字
     'is_required': false,// 编辑表单时，是否必填
   },
   {
     'type': 'input',// 表单类型
-    'label': '体重', // 标签
+    'label': '体重(kg)', // 标签
     'model': 'weight',// 字段名
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
     'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
-    'placeholder': '请输入备注信息', // 提示文字
+    'placeholder': '请输入体重', // 提示文字
     'is_required': false,// 编辑表单时，是否必填
   },
   {
@@ -127,8 +148,8 @@ const tagConfig = [{
     }
   ]
 }]
-// 下拉框选择项,结构为[{'name':'X','value':'Y'}]
-const selectOption = ref([])
+// 下拉框选择项,结构为{'字段名':[{'label':'X','value':'Y'}]}
+const selectOption = reactive({'province_id': [], 'sex': [{'label': '男', 'value': 1}, {'label': '女', 'value': 2}]})
 // 操作配置
 const tableConfig = {
   'edit': true, // 是否编辑
@@ -145,6 +166,7 @@ const tableData = ref([])
 
 // 提交查询事件
 const submitSearch = (value) => {
+  console.log("提交查询了", value)
   tableConfig.page.number = 1
   params.page = 1
   tableConfig.page.number = 1
@@ -283,8 +305,9 @@ function getSelectData() {
   getSelect(params).then((response) => {
     console.log(response)
     for (let i in response.results) {
-      selectOption.value.push({'label': response.results[i].name, 'value': response.results[i].id})
+      selectOption.province_id.push({'label': response.results[i].name, 'value': response.results[i].id})
     }
+    console.log(selectOption)
   }).catch(response => {
     //发生错误时执行的代码
     console.log(response)

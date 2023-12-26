@@ -20,9 +20,13 @@
           <el-form-item v-if="item.type==='time'" :label="item.label" :prop="item.model">
            <el-time-picker v-model="from[item.model]" :placeholder="item.placeholder"/>
           </el-form-item>
+          <el-form-item v-if="item.type==='date'" :label="item.label" :prop="item.model">
+            <el-date-picker v-model="from[item.model]" type="date" :placeholder="item.placeholder"
+                            value-format="YYYY-MM-DD"/>
+          </el-form-item>
           <el-form-item v-if="item.type==='select'" :label="item.label" :prop="item.model">
             <el-select v-model="from[item.model]" :placeholder="item.placeholder">
-              <el-option v-for="(itemOption,indexOption) in selectOption" :key="indexOption"
+              <el-option v-for="(itemOption,indexOption) in selectOption[item.model]" :key="indexOption"
                          :label="itemOption.label" :value="itemOption.value"/>
             </el-select>
           </el-form-item>
@@ -46,6 +50,7 @@ import {storeToRefs} from "pinia";
 import useStore from "@/store";
 import {ElMessage} from "element-plus";
 import AutoInput from "@/components/common/AutoInput.vue";
+
 const {common} = useStore()
 
 // 编辑弹窗是否显示
@@ -63,9 +68,9 @@ const props = defineProps({
     default: []
   },// 表单配置
   selectOption: {
-    type: Array,
+    type: Object,
     required: false,
-    default: []
+    default: {}
   }// 选择框选项
 })
 // 编辑表单对象
@@ -104,7 +109,7 @@ onMounted(() => {
   // console.log("props.fieldConfig", props.fieldConfig)
   // 生成表单配置项
   setTimeout(() => {
-    fieldConfig.value=[]
+    fieldConfig.value = []
     for (const i in props.fieldConfig) {
       // console.log(props.fieldConfig[i].is_search)
       if (props.fieldConfig[i].is_edit) {
