@@ -14,9 +14,9 @@
         <template #label>
           {{ item.label }}
         </template>
-        <span v-if="tagShow(item.model)">
-          <el-tag :type="tagFind(item.model, props.data[item.model])['type']">
-            {{ tagFind(item.model, props.data[item.model])['label'] }}
+        <span v-if="props.tagConfig.hasOwnProperty(item.model)">
+          <el-tag :type="tagConfigFind(item.model, props.data[item.model])['type']">
+            {{ tagConfigFind(item.model, props.data[item.model])['label'] }}
           </el-tag>
         </span>
         <span v-else>{{ props.data[item.model] }}</span>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import {onMounted, reactive, ref, watch} from "vue";
+import {onMounted, ref} from "vue";
 import {storeToRefs} from "pinia";
 import useStore from "@/store";
 import {ElMessage} from "element-plus";
@@ -46,14 +46,11 @@ const props = defineProps({
     required: true,
     default: []
   },// 显示项配置
-  tag: {
-    type: Array,
+  tagConfig: {
+    type: Object,
     required: false,
-    default: [{
-      prop: '',
-      mapping: []
-    }]
-  },// tag标签显示配置
+    default: {}
+  }// tag标签显示配置
 })
 // 详情配置项
 const fieldConfig = ref([])
@@ -61,33 +58,20 @@ const fieldConfig = ref([])
 const closeDialog = () => {
   common.changeShowDialogVisible(false)
 }
-
-// 判断是是否显示自定义标签
-const tagShow = (value) => {
-  // console.log(value)
-  for (let i in props.tag) {
-    // console.log(props.tag[i])
-    if (props.tag[i].prop === value) {
-      return true
-    }
-  }
-  return false
-}
 // 自定义标签正确显示内容
-const tagFind = (prop, value) => {
-  // console.log(prop, value)
-  for (let i in props.tag) {
-    if (props.tag[i]['prop'] === prop) {
-      // 找到了字段
-      // console.log(props.tag[i])
-      for (let j in props.tag[i]['mapping']) {
-        // console.log(props.tag[i]['mapping'][j])
-        if (props.tag[i]['mapping'][j]['value'] === value) {
-          // console.log(props.tag[i]['mapping'][j]['value'])
-          return {'label': props.tag[i]['mapping'][j]['label'], 'type': props.tag[i]['mapping'][j]['type']}
-        }
+const tagConfigFind = (item, value) => {
+  // console.log(item, value)
+  // nextTick(() => {
+  if (value) {
+    for (let i in props.tagConfig[item]) {
+      // console.log(props.tagConfig[item][i])
+      if (value === props.tagConfig[item][i]['value']) {
+        // console.log({'label': props.tagConfig[item][i]['label'], 'type': props.tagConfig[item][i]['type']})
+        return {'label': props.tagConfig[item][i]['label'], 'type': props.tagConfig[item][i]['type']}
       }
     }
+  } else {
+    return {'label': '', 'type': ''}
   }
 }
 
@@ -99,6 +83,7 @@ onMounted(() => {
     }
   }
 })
+
 </script>
 
 <style scoped lang="scss">

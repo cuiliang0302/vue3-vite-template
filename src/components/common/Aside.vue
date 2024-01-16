@@ -4,7 +4,6 @@
       class="el-menu-vertical"
       background-color="#1e263b"
       text-color="#fff"
-      active-text-color="#3498db"
       :collapse="isCollapse"
   >
     <div class="logo" @click="changeCollapse">

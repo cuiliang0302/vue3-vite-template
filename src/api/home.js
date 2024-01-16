@@ -29,7 +29,10 @@ export function putDemo(id, params) {
     const url = '/public/demoUser/' + id + '/'
     return index.put(url, params)
 }
-
+export function putChangePassword(id, params) {
+    const url = '/account/changePassword/' + id + '/'
+    return index.put(url, params)
+}
 // 发送patch请求
 export function patchDemo(id, params) {
     const url = '/public/demoUser/' + id + '/'

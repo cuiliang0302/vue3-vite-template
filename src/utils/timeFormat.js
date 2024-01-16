@@ -21,8 +21,8 @@ export function timeFullRange(startTime, endTime) {
 }
 
 // 时间_用于文件名
-export function timeFile(valueTime) {
-    return dayjs(valueTime).format('YYYY_MM_DD_HH_mm_ss')
+export function timeFile() {
+    return dayjs(new Date()).format('YYYY_MM_DD_HH_mm_ss')
 }
 
 // 字符串转日期

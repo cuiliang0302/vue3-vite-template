@@ -21,7 +21,6 @@ import {getDemo} from "@/api/home";
 
 const {user} = useStore()
 const {id} = storeToRefs(user)
-const state = ref('')
 const links = ref([])
 const props = defineProps({
   field: {
@@ -47,9 +46,8 @@ const querySearch = (queryString, cb) => {
   }
 }
 async function selectData() {
-  let params = {'page': 1, 'size': 10000}
+  let params = {'page': 1, 'size': 1000}
   let data = await getDemo(params)
-  // console.log(data.results)
   for (let i in data.results) {
     links.value.push(
         {

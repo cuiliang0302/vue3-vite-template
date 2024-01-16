@@ -17,7 +17,7 @@
       <el-form-item v-if="item.type==='date'" :label="item.label">
         <el-date-picker v-model="form[item.model]" type="date" :placeholder="item.placeholder"/>
       </el-form-item>
-      <el-form-item v-if="item.type==='datetime-range'" :label="item.label">
+      <el-form-item v-if="item.type==='datetime'" :label="item.label">
         <el-date-picker
             v-model="dateTimeRange"
             type="datetimerange"
@@ -26,8 +26,9 @@
             end-placeholder="结束日期时间"
         />
       </el-form-item>
+
     </span>
-      <slot name="form-item"></slot>
+      <slot name="search-item"></slot>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">
           <el-icon>
@@ -41,7 +42,6 @@
           </el-icon>
           清空
         </el-button>
-        <slot name="search-btn"></slot>
       </el-form-item>
     </el-form>
   </el-card>
@@ -51,6 +51,7 @@
 import {onMounted, reactive, ref, watch} from "vue";
 import {Search, Refresh} from "@element-plus/icons-vue"
 import AutoInput from "@/components/common/AutoInput.vue";
+import {timeFormatConversion} from "@/utils/timeFormat";
 
 const emits = defineEmits(['submitSearch'])
 const props = defineProps({
@@ -83,8 +84,12 @@ watch(
 )
 // 提交搜索
 const onSubmit = () => {
-  // console.log(dateTimeRange.value)
+  console.log(dateTimeRange.value)
   console.log(form)
+  if (dateTimeRange.value) {
+    form['created_time_after'] = timeFormatConversion(dateTimeRange.value[0], 'YYYY-MM-DD HH:mm:ss')
+    form['created_time_before'] = timeFormatConversion(dateTimeRange.value[1], 'YYYY-MM-DD HH:mm:ss')
+  }
   emits('submitSearch', form);
 }
 // 表单清空
@@ -96,21 +101,23 @@ const reset = () => {
 }
 onMounted(() => {
   // console.log(props.fieldConfig)
-  for (const i in props.fieldConfig) {
-    // console.log(props.fieldConfig[i].is_search)
-    if (props.fieldConfig[i].is_search) {
+  setTimeout(() => {
+    for (const i in props.fieldConfig) {
       // console.log(props.fieldConfig[i].is_search)
-      fieldConfig.value.push(props.fieldConfig[i])
+      if (props.fieldConfig[i].is_search) {
+        // console.log("搜索字段", props.fieldConfig[i])
+        fieldConfig.value.push(props.fieldConfig[i])
+      }
     }
-  }
-  // 新增默认值
-  // console.log(fieldConfig)
-  for (let j in fieldConfig.value) {
-    if (fieldConfig.value[j].type === 'date') {
-      // console.log(fieldConfig.value[j])
-      form['date'] = new Date()
+    // 新增默认值
+    // console.log(fieldConfig)
+    for (let j in fieldConfig.value) {
+      if (fieldConfig.value[j].type === 'date') {
+        // console.log(fieldConfig.value[j])
+        form['date'] = new Date()
+      }
     }
-  }
+  }, 0)
 })
 </script>
 
@@ -122,7 +129,10 @@ onMounted(() => {
   align-items: center;
 }
 
-:deep(.el-form-item__label) {
-  min-width: 68px !important;
+//:deep(.el-form-item__label) {
+//  min-width: 68px !important;
+//}
+:deep(.el-form-item__content) {
+  min-width: 130px !important;
 }
 </style>

@@ -5,29 +5,33 @@
       width="40%"
       :before-close="closeDialog"
   >
-    <el-form ref="addFormRef" :model="from" :rules="rules" label-width="100px" :size="'large'">
+    <el-form ref="addFormRef" :model="form" :rules="rules" label-width="100px" :size="'large'">
         <span v-for="(item,index) in fieldConfig" :key="index">
-          <el-form-item v-if="item.type==='input'" :label="item.label" :prop="item.model">
-            <el-input v-model="from[item.model]" :placeholder="item.placeholder"/>
+          <el-form-item v-if="item.type==='text'" :label="item.label" :prop="item.model">
+            <el-input v-model="form[item.model]" :placeholder="item.placeholder"/>
+          </el-form-item>
+          <el-form-item v-if="item.type==='number'" :label="item.label" :prop="item.model">
+            <el-input-number v-model="form[item.model]" controls-position="right" :precision="item.precision"
+                             :placeholder="item.placeholder"/>
           </el-form-item>
           <el-form-item v-if="item.type==='select'" :label="item.label" :prop="item.model">
-            <el-select v-model="from[item.model]" :placeholder="item.placeholder">
+            <el-select v-model="form[item.model]" :placeholder="item.placeholder">
               <el-option v-for="(itemOption,indexOption) in selectOption[item.model]" :key="indexOption"
                          :label="itemOption.label" :value="itemOption.value"/>
             </el-select>
           </el-form-item>
           <el-form-item v-if="item.type==='auto-input'" :label="item.label" :prop="item.model">
-            <AutoInput :field="item.model" v-model="from[item.model]"></AutoInput>
+            <AutoInput :field="item.model" v-model="form[item.model]"></AutoInput>
           </el-form-item>
           <el-form-item v-if="item.type==='datetime'" :label="item.label" :prop="item.model" class="input-datetime">
             <el-date-picker
-                v-model="from[item.model]"
+                v-model="form[item.model]"
                 type="datetime"
                 :placeholder="item.placeholder"
             />
           </el-form-item>
           <el-form-item v-if="item.type==='date'" :label="item.label" :prop="item.model">
-            <el-date-picker v-model="from[item.model]" type="date" :placeholder="item.placeholder"
+            <el-date-picker v-model="form[item.model]" type="date" :placeholder="item.placeholder"
                             value-format="YYYY-MM-DD"/>
           </el-form-item>
         </span>
@@ -69,7 +73,7 @@ const props = defineProps({
 // 添加表单对象
 const addFormRef = ref(null)
 // 添加表单
-let from = reactive({})
+let form = reactive({})
 // 添加项配置
 const fieldConfig = ref([])
 // 表单校验规则
@@ -88,9 +92,9 @@ const addData = async (addFormRef) => {
       }
       // 去除只读字段
       const data = {}
-      for (const j in from) {
+      for (const j in form) {
         if (add_field.indexOf(j) > -1) {
-          data[j] = from[j]
+          data[j] = form[j]
         }
       }
       emits('addData', data)
@@ -99,8 +103,8 @@ const addData = async (addFormRef) => {
       ElMessage.error('请检查表单填写项，然后再提交')
     }
   })
-  for (const key in from) {
-    from[key] = ''
+  for (const key in form) {
+    form[key] = ''
   }
 }
 onMounted(() => {

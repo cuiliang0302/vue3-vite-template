@@ -1,8 +1,11 @@
 import axios from 'axios'
 import {ElMessage} from 'element-plus'
-
+import {onBeforeRouteUpdate, useRouter} from "vue-router";
+import useStore from "@/store";
+import {storeToRefs} from "pinia";
+const {user} = useStore();
+const {token} = storeToRefs(user)
 export function request(config) {
-	// const token = store.state.token
 	// 创建axios的实例
 	const instance = axios.create({
 		baseURL: import.meta.env.VITE_APP_BASE_URL,
@@ -10,9 +13,9 @@ export function request(config) {
 	})
 	// 请求拦截器配置
 	instance.interceptors.request.use(config => {
-			// if (token) {
-			// 	config.headers.Authorization = 'Bearer ' + token
-			// }
+			if (token.value) {
+				config.headers.Authorization = 'Bearer ' + token.value
+			}
 			return config
 		}, error => {
 			console.log(error)
@@ -27,20 +30,20 @@ export function request(config) {
 		if (error.response) {
 			switch (error.response.status) {
 				case 400:
-					return Promise.reject(error.response.data)
+					return Promise.reject(error.response)
 				case 401:
 					console.log("无权访问")
 					ElMessage.error('对不起，您暂无权限访问此接口，请登录重试！')
-					localStorage.clear()
-					sessionStorage.clear()
-					window.location.href="#";
+					window.localStorage.clear()
+					window.sessionStorage.clear()
+					window.location.href="/login";
 					break
 				case 403:
 					console.log("token过期啦")
 					ElMessage.error('对不起，您的身份信息已过期，请重新登录！')
-					localStorage.clear()
-					sessionStorage.clear()
-					window.location.href="#";
+					window.localStorage.clear()
+					window.sessionStorage.clear()
+					window.location.href="/login";
 					break
 				case 404:
 					console.log("404啦")
@@ -56,7 +59,7 @@ export function request(config) {
 		}
 		else {
 			console.log("请求异常")
-			ElMessage.error('请求超时，检查网络状态或刷新重试！')
+			ElMessage.error('网络异常，检查网络状态或刷新重试！')
 		}
 		return Promise.reject(error)
 	})

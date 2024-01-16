@@ -1,11 +1,40 @@
 <template>
-  <Search :fieldConfig="fieldConfig" @submitSearch="submitSearch" :selectOption="selectOption"></Search>
-  <List :data="tableData" :fieldConfig="fieldConfig" :tableConfig="tableConfig"
-        @pageSize="pageSize" @pageNumber="pageNumber" :tag="tagConfig"
-        @submitEdit="submitEdit" @submitShow="submitShow" @submitAdd="submitAdd" @submitDelete="submitDelete"></List>
-  <Show :data="operateForm" :fieldConfig="fieldConfig"></Show>
+  <Search :fieldConfig="fieldConfig" @submitSearch="submitSearch" :selectOption="selectOption">
+    <template #search-item>
+      <el-form-item label="身高范围">
+        <el-input-number v-model="heightForm.height_min" :min="150"/>
+        <span class="range-icon"><el-icon><SemiSelect/></el-icon></span>
+        <el-input-number v-model="heightForm.height_max" :max="200"/>
+      </el-form-item>
+    </template>
+  </Search>
+  <List :data="tableData" :fieldConfig="fieldConfig" :tableConfig="tableConfig" :templateFileUrl="templateFileUrl"
+        @pageSize="pageSize" @pageNumber="pageNumber" :tagConfig="tagConfig" @submitEdit="submitEdit"
+        @submitShow="submitShow" @submitAdd="submitAdd" @submitDelete="submitDelete" @submitExport="submitExport"
+        @submitImport="submitImport" @multipleClick="multipleClick" @submitMultiple="submitMultiple">
+  </List>
+  <Show :data="operateForm" :fieldConfig="fieldConfig" :tagConfig="tagConfig"></Show>
   <Edit :data="operateForm" :fieldConfig="fieldConfig" @editData="editData" :selectOption="selectOption"></Edit>
   <Add :fieldConfig="fieldConfig" @addData="addData" :selectOption="selectOption"></Add>
+  <el-dialog
+      v-model="multipleDialogVisible"
+      title="批量操作数据"
+      width="40%"
+  >
+    <el-form label-width="120px">
+      <el-form-item label="操作数据ID">
+        {{ multipleList }}
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="multipleDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="multipleDialogVisible = false">
+          确定
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup name="tables">
@@ -19,16 +48,17 @@ import useStore from "@/store";
 import {deleteDemo, getDemo, getDemoInfo, getSelect, postDemo, putDemo} from "@/api/home";
 import {ElMessage} from "element-plus";
 import {timeFormatConversion} from "@/utils/timeFormat";
+import {SemiSelect} from "@element-plus/icons-vue";
+import {exportFile} from "@/utils/excel";
 
 const {common} = useStore()
 // 表格字段配置
 const fieldConfig = ref([
   {
-    'label': null, // 标签
+    'label': 'ID', // 标签
     'model': 'id',// 字段名
     'is_table_show': true,// 是否在表格显示
-    'is_info_show': false,// 是否在详情显示
-    'width': 50,
+    'width': 65,
   },
   {
     'type': 'auto-input',// 表单类型
@@ -47,17 +77,11 @@ const fieldConfig = ref([
     'model': 'province',// 字段名
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
-    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
-    'is_edit': false,// 是否可以编辑修改
-    'placeholder': '请选择省份', // 提示文字
-    'is_required': false,// 编辑表单时，是否必填
   },
   {
     'type': 'select',// 表单类型
     'label': '省份', // 标签
     'model': 'province_id',// 字段名
-    'is_table_show': false,// 是否在表格显示
-    'is_info_show': false,// 是否在详情显示
     'is_search': true,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请选择省份', // 提示文字
@@ -67,23 +91,11 @@ const fieldConfig = ref([
     'type': 'select',// 表单类型
     'label': '性别', // 标签
     'model': 'sex',// 字段名
+    'is_search': true,// 是否可搜索，如果是false，不用填写placeholder
     'is_table_show': true,// 是否在表格显示
-    'is_info_show': false,// 是否在详情显示
-    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
-    'placeholder': '请选择性别', // 提示文字
-    'is_required': false,// 编辑表单时，是否必填
-  },
-  {
-    'type': 'select',// 表单类型
-    'label': '性别', // 标签
-    'model': 'sex_name',// 字段名
-    'is_table_show': false,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
-    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
-    'is_edit': false,// 是否可以编辑修改
     'placeholder': '请选择性别', // 提示文字
-    'is_required': false,// 编辑表单时，是否必填
   },
   {
     'type': 'date',// 表单类型
@@ -91,51 +103,53 @@ const fieldConfig = ref([
     'model': 'birthday',// 字段名
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
-    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
-    'placeholder': '请输入生日', // 提示文字
-    'is_required': false,// 编辑表单时，是否必填
+    'placeholder': '请选择生日', // 提示文字
     'width': 135
   },
   {
-    'type': 'input',// 表单类型
-    'label': '身高(m)', // 标签
+    'type': 'number',// 表单类型
+    'label': '身高(cm)', // 标签
     'model': 'height',// 字段名
+    'precision': 0,//精度
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
-    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请输入身高', // 提示文字
-    'is_required': false,// 编辑表单时，是否必填
   },
   {
-    'type': 'input',// 表单类型
+    'type': 'number',// 表单类型
     'label': '体重(kg)', // 标签
     'model': 'weight',// 字段名
+    'precision': 2,//精度
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
-    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请输入体重', // 提示文字
-    'is_required': false,// 编辑表单时，是否必填
   },
   {
     'type': 'datetime',// 表单类型
     'label': '注册时间', // 标签
     'model': 'created_time',// 字段名
+    'is_search': true,
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
-    'is_search': false,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
-    'placeholder': '请输入备注信息', // 提示文字
-    'is_required': false,// 编辑表单时，是否必填
+    'placeholder': '请选择注册时间', // 提示文字
     'width': 170
+  },
+  {
+    'type': 'text',// 表单类型
+    'label': '个人介绍', // 标签
+    'model': 'introduction',// 字段名
+    'is_info_show': true,// 是否在详情显示
+    'is_edit': true,// 是否可以编辑修改
+    'placeholder': '请输入个人介绍', // 提示文字
   }
 ])
 // 标签显示配置
-const tagConfig = [{
-  'prop': 'sex',// 字段
-  'mapping': [
+const tagConfig = reactive({
+  'sex': [
     {
       'value': "1", // 字段值
       'label': '男', // 显示名
@@ -147,15 +161,21 @@ const tagConfig = [{
       'type': 'warning' // 样式
     }
   ]
-}]
+})
 // 下拉框选择项,结构为{'字段名':[{'label':'X','value':'Y'}]}
-const selectOption = reactive({'province_id': [], 'sex': [{'label': '男', 'value': 1}, {'label': '女', 'value': 2}]})
+const selectOption = reactive({
+  'province_id': [],
+  'sex': [{'label': '男', 'value': '1'}, {'label': '女', 'value': '2'}]
+})
 // 操作配置
 const tableConfig = {
   'edit': true, // 是否编辑
   'delete': true, // 是否删除
   'add': true, // 是否添加
   'show': true, // 是否查看详情
+  'export': true,//是否批量导出
+  'import': true,//是否批量导入
+  'multiple': true,//是否多选
   'page': {enable: true, size: 10, number: 1, count: 0},//是否开启分页
   'sort': {prop: 'id', order: 'ascending'}, // 是否默认排序
   'width': 195
@@ -163,13 +183,18 @@ const tableConfig = {
 
 // 表格数据
 const tableData = ref([])
-
+const heightForm = reactive({
+  'height_min': 150,
+  'height_max': 200
+})
 // 提交查询事件
 const submitSearch = (value) => {
   console.log("提交查询了", value)
   tableConfig.page.number = 1
   params.page = 1
   tableConfig.page.number = 1
+  params['height_min'] = heightForm.height_min
+  params['height_max'] = heightForm.height_max
   for (let i in value) {
     params[i] = value[i]
   }
@@ -180,7 +205,6 @@ const submitSearch = (value) => {
 let operateForm = reactive({})
 // 操作的数据ID
 const operateId = ref('')
-
 // 表格查看事件
 const submitShow = (value) => {
   console.log(value)
@@ -263,6 +287,81 @@ const submitDelete = (value) => {
     ElMessage.error('删除数据失败！')
   });
 }
+// 批量导出事件
+const submitExport = () => {
+  ElMessage({
+    message: '开始导出数据，请稍候！',
+    type: 'success',
+  })
+  // 导出数据
+  const printParams = {
+    'size': 10000,
+    'page': 1,
+  }
+  // 导出数据列表
+  let fields = {}
+  // console.log(fieldConfig.value)
+  for (let i in fieldConfig.value) {
+    fields[fieldConfig.value[i]['model']] = fieldConfig.value[i]['label']
+  }
+  getDemo(printParams).then((response) => {
+    for (let i in response.results) {
+      response.results[i]['created_time'] = timeFormatConversion(response.results[i]['created_time'], 'YYYY-MM-DD HH:mm:ss')
+    }
+    let data = JSON.parse(JSON.stringify(response.results));  // 如果直接放置数据不行请加上这句
+    // let filename = printParams.alias + '-' + timeFile(new Date())
+    let filename = '示例用户'
+    console.log("fields", fields)
+    console.log("data", data)
+    exportFile(data, fields, filename);
+  }).catch(response => {
+    //发生错误时执行的代码
+    console.log(response)
+    ElMessage.error('获取列表数据失败！')
+  });
+}
+
+
+// 批量导入模板文件下载地址
+// const templateFileUrl = import.meta.env.VITE_APP_TEMPLATE_URL + 'selfEmployed.xlsx'
+const templateFileUrl = 'https://api.cuiliangblog.cn/static/demo-template.xlsx'
+// 数据批量导入
+const submitImport = (value) => {
+  console.log(value)
+  for (let i in value) {
+    console.log(value[i])
+    console.log(i)
+    setTimeout(() => {
+      postDemo(value[i]).then((response) => {
+        console.log(response)
+        ElMessage({
+          message: `成功插入第${parseInt(i) + 1}条数据！`,
+          type: 'success',
+        })
+      }).catch(response => {
+        //发生错误时执行的代码
+        console.log(response)
+        ElMessage.error('添加数据失败！请检查填写项数值是否正确')
+      });
+    }, 1000)
+  }
+  setTimeout(() => {
+    getTableData()
+  }, 3000)
+}
+// 批量多选弹窗显示
+const multipleDialogVisible = ref(false)
+// 批量多选点击事件
+const multipleClick = () => {
+  multipleDialogVisible.value = true
+}
+// 批量多选操作的元素列表
+const multipleList = ref([])
+// 批量多选更新事件
+const submitMultiple = (value) => {
+  console.log(value)
+  multipleList.value = value
+}
 // 查询参数
 const params = reactive({
   'page': tableConfig.page.number,
@@ -302,7 +401,7 @@ function getTableData() {
 
 // 获取下拉选择框数据
 function getSelectData() {
-  getSelect(params).then((response) => {
+  getSelect({'size': 100, 'page': 1}).then((response) => {
     console.log(response)
     for (let i in response.results) {
       selectOption.province_id.push({'label': response.results[i].name, 'value': response.results[i].id})
@@ -328,5 +427,9 @@ onMounted(() => {
 
 .token {
   text-align: center;
+}
+
+.range-icon {
+  margin: 0 10px
 }
 </style>

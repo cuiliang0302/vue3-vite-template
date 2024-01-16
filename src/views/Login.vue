@@ -62,8 +62,9 @@ import {useRouter} from "vue-router";
 import {ElMessage} from 'element-plus'
 import useStore from "@/store";
 import {postLogin} from "@/api/home";
-
-let {user} = useStore();
+import {storeToRefs} from "pinia";
+const {user} = useStore();
+const {token} = storeToRefs(user)
 const router = useRouter()
 // 登录表单
 const loginForm = reactive({
@@ -83,9 +84,12 @@ const login = () => {
   }).catch(response => {
     //发生错误时执行的代码
     console.log(response)
-    ElMessage.error('账号或密码错误！')
-    loginForm.username = ''
-    loginForm.password = ''
+    if (response.status === 400){
+      ElMessage.error('账号或密码错误！')
+      loginForm.username = ''
+      loginForm.password = ''
+      user.reset()
+    }
   });
 }
 </script>

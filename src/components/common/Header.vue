@@ -5,17 +5,12 @@
     </el-breadcrumb>
   </div>
   <div>
-    <el-dropdown>
-        <span class="el-dropdown-link">
-          {{ username }}
-          <el-icon class="el-icon--right">
-            <arrow-down/>
-          </el-icon>
-        </span>
+    <el-dropdown split-button type="" @command="handle">
+      {{ username }}
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item>修改密码</el-dropdown-item>
-          <el-dropdown-item @click="logout">注销登录</el-dropdown-item>
+          <el-dropdown-item command="password">修改密码</el-dropdown-item>
+          <el-dropdown-item command="logout">注销登录</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -25,25 +20,29 @@
 <script setup>
 import {onBeforeRouteUpdate, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
-import {ArrowDown} from '@element-plus/icons-vue'
 import useStore from "@/store";
 import {storeToRefs} from "pinia";
 import {ElMessage} from "element-plus";
-
 const {user} = useStore();
 const {username} = storeToRefs(user);
 const router = useRouter()
+const emits = defineEmits(['changePassword'])
 // 当前位置
 const location = ref([])
 // 注销登录
-const logout = () => {
-  ElMessage.success({
-    message: '注销成功，正在跳转至登录页！',
-    type: 'success',
-  })
-  localStorage.clear()
-  sessionStorage.clear()
-  router.replace('/login')
+const handle = (value) => {
+  console.log(value)
+  if (value === 'logout') {
+    ElMessage.success({
+      message: '注销成功，正在跳转至登录页！',
+      type: 'success',
+    })
+    window.localStorage.clear()
+    window.sessionStorage.clear()
+    router.replace('/login')
+  } else {
+    emits('changePassword')
+  }
 }
 onMounted(() => {
   location.value = router.currentRoute.value.meta.location
