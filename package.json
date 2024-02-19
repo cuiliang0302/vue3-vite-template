@@ -26,12 +26,14 @@
     "@vueuse/core": "^10.7.2",
     "dayjs": "^1.11.10",
     "element-plus": "^2.5.1",
+    "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "fuse.js": "^7.0.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
     "terser": "^5.26.0",
     "vue": "^3.4.13",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-style": "^0.8.13"
   }
 }

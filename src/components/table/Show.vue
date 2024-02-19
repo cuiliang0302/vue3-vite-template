@@ -77,11 +77,9 @@ const tagConfigFind = (item, value) => {
 
 onMounted(() => {
   // 生成配置项
-  for (const i in props.fieldConfig) {
-    if (props.fieldConfig[i].is_info_show) {
-      fieldConfig.value.push(props.fieldConfig[i])
-    }
-  }
+  fieldConfig.value = props.fieldConfig.filter(item => {
+    return item.is_info_show
+  })
 })
 
 </script>

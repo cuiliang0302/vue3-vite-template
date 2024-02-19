@@ -1,76 +1,59 @@
 <template>
-  <h1>这是测试页</h1>
-  <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
-    <el-radio-button :label="false">expand</el-radio-button>
-    <el-radio-button :label="true">collapse</el-radio-button>
-  </el-radio-group>
-  <el-menu
-      default-active="2"
-      class="el-menu-vertical-demo"
-      :collapse="isCollapse"
-      @open="handleOpen"
-      @close="handleClose"
-  >
-    <el-menu-item index="1" @click="router.push('/')">
-      <el-icon>
-        <home-filled/>
-      </el-icon>
-      <template #title><span>菜单1</span></template>
-    </el-menu-item>
-    <el-sub-menu index="2">
-      <template #title>
-        <el-icon>
-          <trend-charts/>
-        </el-icon>
-        <span>菜单2</span>
-      </template>
-      <el-menu-item index="2-1" @click="router.push('/')">菜单2-1</el-menu-item>
-      <el-menu-item index="2-2" @click="router.push('/')">菜单2-2</el-menu-item>
-    </el-sub-menu>
-    <el-sub-menu index="3">
-      <template #title>
-        <el-icon>
-          <opportunity/>
-        </el-icon>
-        <span>菜单3</span>
-      </template>
-      <el-menu-item index="3-1" @click="router.push('/')">菜单3-1</el-menu-item>
-      <el-menu-item index="3-2" @click="router.push('/')">菜单3-2</el-menu-item>
-    </el-sub-menu>
-    <el-menu-item index="4" @click="router.push('/alert')">
-      <el-icon>
-        <bell-filled/>
-      </el-icon>
-      <template #title><span>菜单4</span></template>
-    </el-menu-item>
-    <el-sub-menu index="5">
-      <template #title>
-        <el-icon>
-          <tools/>
-        </el-icon>
-        <span>菜单5</span>
-      </template>
-      <el-menu-item index="5-1" @click="router.push('/')">菜单5-1</el-menu-item>
-      <el-menu-item index="5-2" @click="router.push('/')">菜单5-2</el-menu-item>
-    </el-sub-menu>
-  </el-menu>
+  <el-button type="primary" @click="exportExcel">导出excel</el-button>
 </template>
 
 <script setup>
-import {HomeFilled, BellFilled, TrendCharts, Opportunity, Tools, ElemeFilled} from "@element-plus/icons-vue"
-import {ref} from "vue";
+import ExcelJS from "exceljs";
+import FileSaver from "file-saver";
+// 导出excel文件
+const exportExcel = () => {
+  // 创建工作簿
+  const workbook = new ExcelJS.Workbook();
+  // 添加工作表，名为sheet1
+  const sheet1 = workbook.addWorksheet("sheet1");
+  // 导出数据列表
+  const data = [
+    {"姓名": "张三", "年龄": 18, "身高": 1.75, "体重": 74},
+    {"姓名": "李四", "年龄": 22, "身高": 1.77, "体重": 84},
+    {"姓名": "王五", "年龄": 53, "身高": 1.55, "体重": 64}
+  ]
+  // 获取表头所有键
+  const headers = Object.keys(data[0])
+  // 将标题写入第一行
+  sheet1.addRow(headers);
+  // 将数据写入工作表
+  data.forEach((row) => {
+    const values = Object.values(row)
+    sheet1.addRow(values);
+  });
+  // 年龄大于18岁红色标注
+  sheet1.addConditionalFormatting({
+    ref: "B2:B4",
+    rules: [
+      {
+        type: "cellIs",
+        operator: "greaterThan",
+        priority: 1,
+        formulae: [18],
+        style: {
+          fill: {
+            type: "pattern",
+            pattern: "solid",
+            bgColor: { argb: "FFFFC0CB" },
+          },
+        },
+      },
+    ],
+  });
+  // 导出表格文件
+  workbook.xlsx.writeBuffer().then((buffer) => {
+    let file = new Blob([buffer], {type: "application/octet-stream"});
+    FileSaver.saveAs(file, "ExcelJS.xlsx");
+  }).catch(error => console.log('Error writing excel export', error))
+}
 
-const isCollapse = ref(true)
-const handleOpen = (key, keyPath) => {
-  console.log(key, keyPath)
-}
-const handleClose = (key, keyPath) => {
-  console.log(key, keyPath)
-}
 </script>
 
 <style scoped lang="scss">
-.el-menu-vertical-demo:not(.el-menu--collapse){
-  width: 250px;
-}
+
 </style>

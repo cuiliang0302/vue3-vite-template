@@ -102,13 +102,9 @@ const reset = () => {
 onMounted(() => {
   // console.log(props.fieldConfig)
   setTimeout(() => {
-    for (const i in props.fieldConfig) {
-      // console.log(props.fieldConfig[i].is_search)
-      if (props.fieldConfig[i].is_search) {
-        // console.log("搜索字段", props.fieldConfig[i])
-        fieldConfig.value.push(props.fieldConfig[i])
-      }
-    }
+    fieldConfig.value = props.fieldConfig.filter(item => {
+      return item.is_search
+    })
     // 新增默认值
     // console.log(fieldConfig)
     for (let j in fieldConfig.value) {

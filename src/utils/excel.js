@@ -1,69 +1,100 @@
-import fs from 'file-saver'
+// 引入依赖
+import ExcelJS from "exceljs";
+import FileSaver from "file-saver";
 import {timeFile} from "@/utils/timeFormat";
-import {read, utils, write} from "xlsx";
-import {ref} from "vue";
+
 
 // 导出excel文件
-export function exportFile(json, fields, filename) {
-    json.forEach(item => {
-        for (let i in item) {
-            if (fields.hasOwnProperty(i)) {
-                item[fields[i]] = item[i];
-            }
-            delete item[i]; //删除原先的对象属性
-        }
+export function exportFile(export_data, filename) {
+    // 创建工作簿
+    const workbook = new ExcelJS.Workbook();
+    // 添加工作表，名为sheet1
+    const sheet1 = workbook.addWorksheet("sheet1");
+    // 获取表头所有键
+    const headers = Object.keys(export_data[0])
+    // 将标题写入第一行
+    sheet1.addRow(headers);
+    // 将数据写入工作表
+    export_data.forEach((row) => {
+        const values = Object.values(row)
+        sheet1.addRow(values);
+    });
+    // 设置默认宽高属性
+    sheet1.properties.defaultColWidth = 20
+    sheet1.properties.defaultRowHeight = 20
+    // 修改所有单元格样式
+    // 遍历每一行
+    sheet1.eachRow((row, rowNumber) => {
+        // 遍历每个单元格
+        row.eachCell((cell) => {
+            // 设置边框样式
+            cell.border = {
+                top: {style: 'thin'},
+                left: {style: 'thin'},
+                bottom: {style: 'thin'},
+                right: {style: 'thin'}
+            };
+            // 设置居中对齐
+            cell.alignment = {
+                vertical: 'middle',
+                horizontal: 'center'
+            };
+        });
+    });
+    // 获取标题行数据
+    const titleCell = sheet1.getRow(1);
+    // 设置标题行单元格样式
+    titleCell.eachCell((cell) => {
+        // 设置标题行背景颜色
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: {argb: '3498db'}
+        };
+        // 设置标题行字体
+        cell.font = {
+            bold: true,// 字体粗体
+        };
     })
-    let sheetName = filename //excel的文件名称
-    let wb = utils.book_new()  //工作簿对象包含一SheetNames数组，以及一个表对象映射表名称到表对象。XLSX.utils.book_new实用函数创建一个新的工作簿对象。
-    let ws = utils.json_to_sheet(json, {header: Object.values(fields)}) //将JS对象数组转换为工作表。
-    wb.SheetNames.push(sheetName)
-    wb.Sheets[sheetName] = ws
-    const defaultCellStyle = {font: {name: "Verdana", sz: 13, color: "FF00FF88"}, fill: {fgColor: {rgb: "FFFFAA00"}}};//设置表格的样式
-    let wopts = {
-        bookType: 'xlsx',
-        bookSST: false,
-        type: 'binary',
-        cellStyles: true,
-        defaultCellStyle: defaultCellStyle,
-        showGridLines: false
-    }  //写入的样式
-    let wbout = write(wb, wopts)
-    let blob = new Blob([s2ab(wbout)], {type: 'application/octet-stream'})
-    fs.saveAs(blob, filename + timeFile() + '.xlsx')
-}
-
-const s2ab = s => {
-    if (typeof ArrayBuffer !== 'undefined') {
-        const buf = new ArrayBuffer(s.length)
-        const view = new Uint8Array(buf)
-        for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
-        return buf
-    } else {
-        const buf = new Array(s.length);
-        for (let i = 0; i !== s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF;
-        return buf;
-    }
+    // 导出表格文件
+    workbook.xlsx.writeBuffer().then((buffer) => {
+        let file = new Blob([buffer], {type: "application/octet-stream"});
+        FileSaver.saveAs(file, filename + timeFile() + ".xlsx");
+    }).catch(error => console.log('Error writing excel export', error))
 }
 
 // 导入excel文件
-export function importFile(file) {
-    return new Promise(function (resolve, reject) {
-        let data = []
-        const reader = new FileReader();
-        reader.onload = () => {
-            const contents = reader.result;
-            const workbook = read(contents, {
-                type: "binary"
-            })
-            const ws_name = workbook.SheetNames[0]
-            data = utils.sheet_to_json(workbook.Sheets[ws_name])// 转换成json的数据
-            // console.log('data', data)
-            resolve(data)
-        };
-        reader.onerror=()=>{
-            reject(NaN)
-        }
-        reader.readAsBinaryString(file.raw);
-        // console.log('data', data)
+export function importFile(content) {
+    return new Promise((resolve, reject) => {
+        // 创建一个空的JavaScript对象数组，用于存储解析后的数据
+        const data = [];
+        //创建Workbook实例
+        const workbook = new ExcelJS.Workbook();
+        workbook.xlsx.load(content).then(workbook => {
+            // 获取第一个worksheet内容
+            const worksheet = workbook.getWorksheet(1);
+            // 获取第一行的标题
+            const headers = [];
+            worksheet.getRow(1).eachCell((cell) => {
+                headers.push(cell.value);
+            });
+            // console.log("headers", headers)
+            // 遍历工作表的每一行（从第二行开始，因为第一行通常是标题行）
+            for (let rowNumber = 2; rowNumber <= worksheet.rowCount; rowNumber++) {
+                const rowData = {};
+                const row = worksheet.getRow(rowNumber);
+                // 遍历当前行的每个单元格
+                row.eachCell((cell, colNumber) => {
+                    // 获取标题对应的键，并将当前单元格的值存储到相应的属性名中
+                    rowData[headers[colNumber - 1]] = cell.value;
+                });
+                // 将当前行的数据对象添加到数组中
+                data.push(rowData);
+            }
+            // console.log("data", data)
+            resolve(data);
+        }).catch(error => {
+            reject(error);
+        });
     })
 }

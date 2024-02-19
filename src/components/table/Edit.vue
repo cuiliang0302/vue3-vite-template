@@ -110,18 +110,11 @@ const editData = async (editFormRef) => {
 }
 
 onMounted(() => {
-  // console.log("props.fieldConfig", props.fieldConfig)
   // 生成表单配置项
-  setTimeout(() => {
-    fieldConfig.value = []
-    for (const i in props.fieldConfig) {
-      // console.log(props.fieldConfig[i].is_search)
-      if (props.fieldConfig[i].is_edit) {
-        // console.log(props.fieldConfig[i].is_search)
-        fieldConfig.value.push(props.fieldConfig[i])
-      }
-    }
-  }, 0)
+  fieldConfig.value = props.fieldConfig.filter(item => {
+    return item.is_edit
+  })
+  // console.log("editFieldConfig.value", fieldConfig.value)
   // 生成验证表单规则
   for (const j in fieldConfig.value) {
     if (fieldConfig.value[j].is_required) {

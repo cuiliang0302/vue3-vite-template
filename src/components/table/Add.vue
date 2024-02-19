@@ -109,11 +109,14 @@ const addData = async (addFormRef) => {
 }
 onMounted(() => {
   // 生成表单配置项
-  for (const i in props.fieldConfig) {
-    if (props.fieldConfig[i].is_edit) {
-      fieldConfig.value.push(props.fieldConfig[i])
-    }
-  }
+  // for (const i in props.fieldConfig) {
+  //   if (props.fieldConfig[i].is_edit) {
+  //     fieldConfig.value.push(props.fieldConfig[i])
+  //   }
+  // }
+  fieldConfig.value = props.fieldConfig.filter(item => {
+    return item.is_edit
+  })
   // 生成验证表单规则
   for (const j in fieldConfig.value) {
     if (fieldConfig.value[j].is_required) {

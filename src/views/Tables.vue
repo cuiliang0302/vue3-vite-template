@@ -59,6 +59,7 @@ const fieldConfig = ref([
     'model': 'id',// 字段名
     'is_table_show': true,// 是否在表格显示
     'width': 65,
+    'is_export': true,// 是否导出该字段
   },
   {
     'type': 'auto-input',// 表单类型
@@ -70,6 +71,7 @@ const fieldConfig = ref([
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请输入用户名', // 提示文字
     'is_required': true,// 编辑表单时，是否必填
+    'is_export': true, // 是否导出该字段
   },
   {
     'type': 'select',// 表单类型
@@ -77,10 +79,11 @@ const fieldConfig = ref([
     'model': 'province',// 字段名
     'is_table_show': true,// 是否在表格显示
     'is_info_show': true,// 是否在详情显示
+    'is_export': true // 是否导出该字段
   },
   {
     'type': 'select',// 表单类型
-    'label': '省份', // 标签
+    'label': '省份ID', // 标签
     'model': 'province_id',// 字段名
     'is_search': true,// 是否可搜索，如果是false，不用填写placeholder
     'is_edit': true,// 是否可以编辑修改
@@ -98,6 +101,11 @@ const fieldConfig = ref([
     'placeholder': '请选择性别', // 提示文字
   },
   {
+    'label': '性别', // 标签
+    'model': 'sex_name',// 字段名
+    'is_export': true // 是否导出该字段
+  },
+  {
     'type': 'date',// 表单类型
     'label': '生日', // 标签
     'model': 'birthday',// 字段名
@@ -105,7 +113,8 @@ const fieldConfig = ref([
     'is_info_show': true,// 是否在详情显示
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请选择生日', // 提示文字
-    'width': 135
+    'width': 135,
+    'is_export': true, // 是否导出该字段
   },
   {
     'type': 'number',// 表单类型
@@ -116,6 +125,7 @@ const fieldConfig = ref([
     'is_info_show': true,// 是否在详情显示
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请输入身高', // 提示文字
+    'is_export': true, // 是否导出该字段
   },
   {
     'type': 'number',// 表单类型
@@ -126,6 +136,7 @@ const fieldConfig = ref([
     'is_info_show': true,// 是否在详情显示
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请输入体重', // 提示文字
+    'is_export': true,// 是否导出该字段
   },
   {
     'type': 'datetime',// 表单类型
@@ -136,6 +147,7 @@ const fieldConfig = ref([
     'is_info_show': true,// 是否在详情显示
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请选择注册时间', // 提示文字
+    'is_export': true, // 是否导出该字段
     'width': 170
   },
   {
@@ -145,6 +157,7 @@ const fieldConfig = ref([
     'is_info_show': true,// 是否在详情显示
     'is_edit': true,// 是否可以编辑修改
     'placeholder': '请输入个人介绍', // 提示文字
+    'is_export': true,// 是否导出该字段
   }
 ])
 // 标签显示配置
@@ -192,7 +205,6 @@ const submitSearch = (value) => {
   console.log("提交查询了", value)
   tableConfig.page.number = 1
   params.page = 1
-  tableConfig.page.number = 1
   params['height_min'] = heightForm.height_min
   params['height_max'] = heightForm.height_max
   for (let i in value) {
@@ -293,49 +305,64 @@ const submitExport = () => {
     message: '开始导出数据，请稍候！',
     type: 'success',
   })
-  // 导出数据
+  // 导出数据查询参数
   const printParams = {
-    'size': 10000,
+    'size': 1000,
     'page': 1,
   }
-  // 导出数据列表
-  let fields = {}
-  // console.log(fieldConfig.value)
-  for (let i in fieldConfig.value) {
-    fields[fieldConfig.value[i]['model']] = fieldConfig.value[i]['label']
-  }
+  // 获取需要导出的字段配置
+  const export_fields = fieldConfig.value
+      .filter(obj => obj['is_export'])
+      .map(({label, model}) => ({[model]: label}))
+  // 处理数据结构
   getDemo(printParams).then((response) => {
-    for (let i in response.results) {
-      response.results[i]['created_time'] = timeFormatConversion(response.results[i]['created_time'], 'YYYY-MM-DD HH:mm:ss')
-    }
-    let data = JSON.parse(JSON.stringify(response.results));  // 如果直接放置数据不行请加上这句
-    // let filename = printParams.alias + '-' + timeFile(new Date())
+    // console.log(response.results)
+    const export_data = response.results.map(obj => {
+      const newObj = {};
+      export_fields.forEach(field => {
+        const [key, value] = Object.entries(field)[0];
+        if (key === 'created_time') {
+          newObj[value] = timeFormatConversion((obj[key]), 'YYYY-MM-DD HH:mm:ss');
+        } else {
+          newObj[value] = obj[key];
+        }
+      });
+      return newObj;
+    });
     let filename = '示例用户'
-    console.log("fields", fields)
-    console.log("data", data)
-    exportFile(data, fields, filename);
+    exportFile(export_data, filename);
   }).catch(response => {
     //发生错误时执行的代码
     console.log(response)
     ElMessage.error('获取列表数据失败！')
   });
 }
-
-
 // 批量导入模板文件下载地址
 // const templateFileUrl = import.meta.env.VITE_APP_TEMPLATE_URL + 'selfEmployed.xlsx'
 const templateFileUrl = 'https://api.cuiliangblog.cn/static/demo-template.xlsx'
 // 数据批量导入
 const submitImport = (value) => {
   console.log(value)
-  for (let i in value) {
-    console.log(value[i])
-    console.log(i)
+  const result = value.map(obj => {
+    const newObj = {};
+    Object.keys(obj).forEach(key => {
+      const matchingKey = fieldConfig.value.find(item => item.label === key);
+      if (matchingKey) {
+        newObj[matchingKey.model] = obj[key];
+      } else {
+        newObj[key] = obj[key];
+      }
+    });
+    return newObj;
+  });
+  console.log(result)
+  result.forEach((item, index) => {
+    console.log(item, index)
     setTimeout(() => {
-      postDemo(value[i]).then((response) => {
+      postDemo(item).then((response) => {
         console.log(response)
         ElMessage({
-          message: `成功插入第${parseInt(i) + 1}条数据！`,
+          message: `成功插入第${parseInt(index) + 1}条数据！`,
           type: 'success',
         })
       }).catch(response => {
@@ -344,10 +371,10 @@ const submitImport = (value) => {
         ElMessage.error('添加数据失败！请检查填写项数值是否正确')
       });
     }, 1000)
-  }
-  setTimeout(() => {
-    getTableData()
-  }, 3000)
+    setTimeout(() => {
+      getTableData()
+    }, 1000)
+  })
 }
 // 批量多选弹窗显示
 const multipleDialogVisible = ref(false)
@@ -387,11 +414,11 @@ function getTableData() {
   getDemo(params).then((response) => {
     console.log(response)
     tableConfig.page.count = response.count
-    tableData.value = response.results
-    for (let i in tableData.value) {
-      tableData.value[i]['birthday'] = timeFormatConversion(tableData.value[i]['birthday'], 'YYYY年MM月DD日')
-      tableData.value[i]['created_time'] = timeFormatConversion(tableData.value[i]['created_time'], 'YYYY-MM-DD HH:mm:ss')
-    }
+    tableData.value = response.results.map(({birthday, created_time, ...item}) => ({
+      ...item,
+      birthday: timeFormatConversion(birthday, 'YYYY年MM月DD日'),
+      created_time: timeFormatConversion(created_time, 'YYYY-MM-DD HH:mm:ss')
+    }))
   }).catch(response => {
     //发生错误时执行的代码
     console.log(response)

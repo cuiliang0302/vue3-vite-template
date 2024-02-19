@@ -71,37 +71,40 @@
         title="批量导入数据"
         width="40%"
     >
-      <el-form label-width="120px">
-        <el-form-item label="模板下载：">
-          <el-button type="info" @click="downloadTemplate(props.templateFileUrl)">
-            <el-icon>
-              <Download/>
-            </el-icon>
-            点击下载
-          </el-button>
-        </el-form-item>
-        <el-form-item label="文件上传：">
-          <el-upload drag accept=".xls,.xlsx" :auto-upload="false" :on-change="handleChange">
-            <el-icon class="el-icon--upload">
-              <upload-filled/>
-            </el-icon>
-            <div class="el-upload__text">
-              将文件拖到此处，或<em>点击上传</em>
+      <el-steps :space="200" :active="stepActive" simple style="margin-bottom: 15px">
+        <el-step title="下载模板" :icon="Document"/>
+        <el-step title="上传表格" :icon="DocumentAdd"/>
+        <el-step title="预览数据" :icon="Tickets"/>
+      </el-steps>
+      <div v-show="stepActive===0">
+        请点击
+        <el-button type="primary" text @click="downloadTemplate">此处</el-button>
+        下载模板文件
+      </div>
+      <div v-show="stepActive===1">
+        <el-upload drag accept=".xls,.xlsx" :auto-upload="false" :on-change="handleChange">
+          <el-icon class="el-icon--upload">
+            <upload-filled/>
+          </el-icon>
+          <div class="el-upload__text">
+            将文件拖到此处，或<em>点击上传</em>
+          </div>
+          <template #tip>
+            <div class="el-upload__tip">
+              请上传.xls,.xlsx格式文件，文件最大为500kb
             </div>
-            <template #tip>
-              <div class="el-upload__tip">
-                请上传.xls,.xlsx格式文件，文件最大为500kb
-              </div>
-            </template>
-          </el-upload>
-        </el-form-item>
-      </el-form>
+          </template>
+        </el-upload>
+      </div>
+      <div v-show="stepActive===2">
+        <el-table :data="uploadData" style="width: 100%" stripe border>
+          <el-table-column v-for="item in uploadDataProp" :prop="item" :label="item"/>
+        </el-table>
+      </div>
       <template #footer>
       <span class="dialog-footer">
-        <el-button @click="uploadDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitUpload">
-          导入
-        </el-button>
+        <el-button @click="cancelClick">取消</el-button>
+        <el-button type="primary" @click="stepClick">{{ stepText }}</el-button>
       </span>
       </template>
     </el-dialog>
@@ -109,9 +112,9 @@
 </template>
 <script setup>
 import {onMounted, ref} from "vue";
-import {Download, EditPen, Plus, Upload, UploadFilled} from "@element-plus/icons-vue"
-import {importFile} from "@/utils/excel";
+import {Download, EditPen, Plus, Upload, Document, DocumentAdd, Tickets, UploadFilled} from "@element-plus/icons-vue"
 import {ElMessage} from "element-plus";
+import {importFile} from "@/utils/excel";
 
 const emits = defineEmits(['submitShow', 'submitDelete', 'submitEdit', 'submitAdd', 'submitExport',
   'submitImport', 'multipleClick', 'submitMultiple', 'pageSize', 'pageNumber', 'submitCode'])
@@ -181,29 +184,63 @@ const importClick = () => {
 }
 // 批量导入文件弹窗
 const uploadDialogVisible = ref(false)
-// 下载模板文件
-const downloadTemplate = (url) => {
-  window.open(url)
+// 步骤条当前步骤
+const stepActive = ref(0)
+// 导入弹窗按钮文字
+const stepText = ref('下一步')
+// 点击上传窗口步骤按钮事件
+const stepClick = () => {
+  stepActive.value++
+  switch (stepActive.value) {
+    case 2:
+      stepText.value = "导入"
+      break;
+    case 3:
+      uploadDialogVisible.value = false
+      stepText.value = "下一步"
+      stepActive.value = 0
+      console.log("开始上传了啊")
+      emits('submitImport', uploadData.value);
+      break;
+    default:
+      break;
+  }
 }
-// 上传数据
-const uploadData = ref([])
-// 文件上传事件
-const handleChange = async (file) => {
-  // console.log("file", file)
-  await importFile(file).then(data => {
-    uploadData.value = data
-  }).catch(() => {
-    console.log('解析失败')
-    ElMessage.error('Excel文件解析失败！请检查文件内容重新上传')
-  })
-  // console.log("uploadData.value", uploadData.value)
-};
-// 批量添加数据提交事件
-const submitUpload = () => {
+// 点击上传窗口取消按钮事件
+const cancelClick = () => {
+  stepText.value = "下一步"
+  stepActive.value = 0
   uploadDialogVisible.value = false
-  // console.log("submit-data", uploadData.value)
-  emits('submitImport', uploadData.value);
 }
+// 下载模板文件
+const downloadTemplate = () => {
+  window.open(props.templateFileUrl)
+}
+// 上传数据内容
+const uploadData = ref([])
+// 上传数据字段
+const uploadDataProp = ref([])
+// 文件上传事件
+const handleChange = (file) => {
+  console.log("file", file.raw)
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const content = reader.result;
+    importFile(content).then((data) => {
+      console.log(data)
+      uploadData.value = data
+      uploadDataProp.value = Object.keys(uploadData.value[0])
+      console.log("uploadData.value", uploadData.value)
+      console.log(uploadData.value[0])
+    }).catch(response => {
+      //发生错误时执行的代码
+      console.log(response)
+      ElMessage.error('获取列表数据失败！')
+    });
+  };
+  reader.readAsBinaryString(file.raw);
+};
+
 // 批量多选点击事件
 const multipleClick = () => {
   emits('multipleClick');
@@ -229,27 +266,24 @@ const handleCurrentChange = (val) => {
   // console.log(`current page: ${val}`)
 }
 // 自定义标签正确显示内容
-const tagConfigFind = (item, value) => {
-  // console.log(item, value)
-  for (let i in props.tagConfig[item]) {
-    // console.log(props.tagConfig[item][i])
-    if (value === props.tagConfig[item][i]['value']) {
-      // console.log({'label': props.tagConfig[item][i]['label'], 'type': props.tagConfig[item][i]['type']})
-      return {'label': props.tagConfig[item][i]['label'], 'type': props.tagConfig[item][i]['type']}
+const tagConfigFind = (tag, value) => {
+  if (value) {
+    // console.log(tag, value)
+    for (let i in props.tagConfig[tag]) {
+      // console.log(props.tagConfig[item][i])
+      if (value === props.tagConfig[tag][i]['value']) {
+        // console.log({'label': props.tagConfig[item][i]['label'], 'type': props.tagConfig[item][i]['type']})
+        return {'label': props.tagConfig[tag][i]['label'], 'type': props.tagConfig[tag][i]['type']}
+      }
     }
   }
 }
 const tableRef = ref(null)
 onMounted(() => {
-  setTimeout(() => {
-    fieldConfig.value = []
-    for (const i in props.fieldConfig) {
-      if (props.fieldConfig[i].is_table_show) {
-        // console.log(props.fieldConfig[i].is_search)
-        fieldConfig.value.push(props.fieldConfig[i])
-      }
-    }
-  }, 0)
+  fieldConfig.value = props.fieldConfig.filter(item => {
+    return item.is_table_show
+  })
+  // console.log("fieldConfig.value", fieldConfig.value)
 })
 
 </script>
