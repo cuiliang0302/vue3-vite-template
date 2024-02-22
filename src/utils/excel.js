@@ -1,9 +1,6 @@
-// 引入依赖
 import ExcelJS from "exceljs";
 import FileSaver from "file-saver";
 import {timeFile} from "@/utils/timeFormat";
-
-
 // 导出excel文件
 export function exportFile(export_data, filename) {
     // 创建工作簿

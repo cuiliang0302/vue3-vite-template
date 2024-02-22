@@ -23,8 +23,8 @@ PC前端项目初始化模板，用于快速开发后台管理项目
   ![本地路径](./screenshot/Snipaste_2024-01-16_10-16-30.png)
 * 表格页
   ![本地路径](./screenshot/Snipaste_2024-01-16_10-16-57.png)
-  ![本地路径](./screenshot/Snipaste_2024-01-16_10-17-06.png)
   ![本地路径](./screenshot/Snipaste_2024-01-16_10-17-18.png)
+  ![本地路径](./screenshot/Snipaste_2024-02-22_16-48-29.png)
 ## 开发与运行
 
 ### 安装依赖
