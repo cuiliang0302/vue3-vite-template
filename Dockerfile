@@ -1,4 +1,4 @@
-FROM node:20.11.0 AS build
+FROM node:22.12.0 AS build
 COPY . /opt/vue
 WORKDIR /opt/vue
 RUN npm install --registry https://registry.npm.taobao.org && npm run build

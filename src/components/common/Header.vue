@@ -57,8 +57,4 @@ onBeforeRouteUpdate((to) => {
 div:nth-child(1) {
   flex: 1;
 }
-
-div:nth-child(2) {
-  width: 100px;
-}
 </style>

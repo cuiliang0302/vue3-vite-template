@@ -29,10 +29,12 @@ export function putDemo(id, params) {
     const url = '/public/demoUser/' + id + '/'
     return index.put(url, params)
 }
+
 export function putChangePassword(id, params) {
     const url = '/account/changePassword/' + id + '/'
     return index.put(url, params)
 }
+
 // 发送patch请求
 export function patchDemo(id, params) {
     const url = '/public/demoUser/' + id + '/'
@@ -48,4 +50,9 @@ export function deleteDemo(id) {
 export function getSelect(params) {
     const url = '/public/demoProvince/'
     return index.get(url, params)
+}
+
+// 获取SSE数据
+export function getSSE()  {
+    return import.meta.env.VITE_APP_BASE_URL + '/sse/demo/'
 }
